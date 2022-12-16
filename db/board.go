@@ -17,9 +17,9 @@ func NewBoard(pool *pgxpool.Pool, slug string, name string, descr string) error 
 	}
 	root_post_query := `
 	INSERT INTO post (no, resto, board, com, time) VALUES
-	(0, 0, $1, "", NOW())
+	(0, 0, $1, $2, NOW())
 	`
-	_, err = pool.Query(context.Background(), root_post_query, slug)
+	_, err = pool.Query(context.Background(), root_post_query, slug, "root_post")
 	if err != nil {
 		return err
 	}

@@ -58,6 +58,7 @@ func ApplyHandlers(app *gin.Engine) {
 	app.GET("/:board/archive", get_archive)
 	app.GET("/:board/:page", get_page)
 	app.GET("/:board/thread/:op", get_thread)
+	app.GET("/newboard", NewBoard)
 	// By default it serves on :8080 unless a
 	// PORT environment variable was defined.
 	//router.Run()
