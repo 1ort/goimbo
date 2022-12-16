@@ -37,7 +37,6 @@ func ReadConfig(configPath string) *Config {
 func (cfg *Config) GetDataBaseUrl() string {
 	db_template := "postgresql://%s:%s/%s?user=%s&password=%s"
 	db_url := fmt.Sprintf(db_template, cfg.Db.Host, cfg.Db.Port, cfg.Db.Name, cfg.Db.User, cfg.Db.Pass)
-	//db_url := "postgresql://" + cfg.Db.Host + ":" + cfg.Db.Port + "/" + cfg.Db.Name + "?user=" + cfg.Db.User + "&password=" + cfg.Db.Pass
 	return db_url
 }
 
