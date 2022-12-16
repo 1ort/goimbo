@@ -4,12 +4,13 @@ import (
 	"github.com/1ort/goimbo/db"
 	"github.com/1ort/goimbo/framework"
 	"github.com/1ort/goimbo/handler"
+	"github.com/1ort/goimbo/utils"
 )
 
 func main() {
 	app := framework.NewApp()
-
-	db_pool := db.NewPool("postgres://postgres:postgres@localhost:5432/goimbo") //TODO: use config file / env vars
+	db_url := utils.GerDataBaseUrl()
+	db_pool := db.NewPool(db_url) //TODO: use config file / env vars
 	defer db_pool.Close()
 
 	db.InitDatabase(db_pool)

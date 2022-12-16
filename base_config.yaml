@@ -1,8 +1,8 @@
 db:
   host:
   port:
-  username:
-  password:
-  db_name:
+  user:
+  pass:
+  name:
   
-
+    :
