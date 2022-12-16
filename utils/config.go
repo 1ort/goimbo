@@ -17,13 +17,13 @@ type ConfigStruct struct {
 	}
 }
 
-func GetDataBaseUrl() string {
+func GetDataBaseUrl(configPath string) string {
 	mydir, err := os.Getwd()
 	if err != nil {
 		panic(err)
 	}
 
-	file, err := ioutil.ReadFile(mydir + "/config.yaml")
+	file, err := ioutil.ReadFile(mydir + configPath)
 
 	if err != nil {
 		panic(err)
