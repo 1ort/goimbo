@@ -9,8 +9,8 @@ import (
 
 func main() {
 	app := framework.NewApp()
-	db_url := utils.GerDataBaseUrl()
-	db_pool := db.NewPool(db_url) //TODO: use config file / env vars
+	db_url := utils.GetDataBaseUrl()
+	db_pool := db.NewPool(db_url)
 	defer db_pool.Close()
 
 	db.InitDatabase(db_pool)
