@@ -4,3 +4,6 @@ db:
   user:
   pass:
   name:
+app:
+  host: localhost #hostname
+  port: 3000 #webserver port

@@ -1,7 +1,6 @@
 package utils
 
 import (
-	// "io/ioutil"
 	"fmt"
 	"os"
 
@@ -9,6 +8,10 @@ import (
 )
 
 type Config struct {
+	App struct {
+		Host string `yaml:"host"`
+		Port string `yaml:"port"`
+	}
 	Db struct {
 		Host string `yaml:"host"`
 		Port string `yaml:"port"`
@@ -32,6 +35,14 @@ func ReadConfig(configPath string) *Config {
 }
 
 func (cfg *Config) GetDataBaseUrl() string {
-	db_url := "postgresql://" + cfg.Db.Host + ":" + cfg.Db.Port + "/" + cfg.Db.Name + "?user=" + cfg.Db.User + "&password=" + cfg.Db.Pass
+	db_template := "postgresql://%s:%s/%s?user=%s&password=%s"
+	db_url := fmt.Sprintf(db_template, cfg.Db.Host, cfg.Db.Port, cfg.Db.Name, cfg.Db.User, cfg.Db.Pass)
+	//db_url := "postgresql://" + cfg.Db.Host + ":" + cfg.Db.Port + "/" + cfg.Db.Name + "?user=" + cfg.Db.User + "&password=" + cfg.Db.Pass
 	return db_url
+}
+
+func (cfg *Config) GetAppAddr() string {
+	addr_template := "%s:%s"
+	addr := fmt.Sprintf(addr_template, cfg.App.Host, cfg.App.Port)
+	return addr
 }
