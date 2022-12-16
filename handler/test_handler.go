@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/1ort/goimbo/framework"
 	"github.com/gin-gonic/gin"
 )
 
@@ -53,13 +54,17 @@ func ApplyHandlers(app *gin.Engine) {
 	//router := gin.Default()
 
 	app.GET("/boards", get_boards)
-	app.GET("/:board/threads", get_threads)
-	app.GET("/:board/catalog", get_catalog)
-	app.GET("/:board/archive", get_archive)
-	app.GET("/:board/:page", get_page)
-	app.GET("/:board/thread/:op", get_thread)
-	app.POST("/:board/newpost", NewPost)
+	board := app.Group("/:board")
+	board.Use(framework.BoardExists())
+
+	board.GET("/threads", get_threads)
+	board.GET("/catalog", get_catalog)
+	board.GET("/archive", get_archive)
+	board.GET("/:page", get_page)
+	board.GET("/thread/:op", get_thread)
+	board.POST("/newpost", NewPost)
 	app.GET("/newboard", NewBoard)
+	//app.GET("/:board/", get_board_index)
 	// By default it serves on :8080 unless a
 	// PORT environment variable was defined.
 	//router.Run()
