@@ -17,7 +17,6 @@ func main() {
 	db_url := conf.GetDataBaseUrl()
 
 	app := framework.NewApp()
-	//db_url := utils.GetDataBaseUrl(*confPtr)
 	db_pool := db.NewPool(db_url)
 	defer db_pool.Close()
 
