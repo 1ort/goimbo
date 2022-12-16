@@ -1,13 +1,14 @@
 package utils
 
 import (
-	"io/ioutil"
+	// "io/ioutil"
+	"fmt"
 	"os"
 
 	"gopkg.in/yaml.v3"
 )
 
-type ConfigStruct struct {
+type Config struct {
 	Db struct {
 		Host string `yaml:"host"`
 		Port string `yaml:"port"`
@@ -17,24 +18,20 @@ type ConfigStruct struct {
 	}
 }
 
-func GetDataBaseUrl(configPath string) string {
-	mydir, err := os.Getwd()
+func ReadConfig(configPath string) *Config {
+	config_file, err := os.ReadFile(configPath)
 	if err != nil {
-		panic(err)
+		panic(fmt.Sprintf("Can not open config file, error: %s", err))
 	}
-
-	file, err := ioutil.ReadFile(mydir + configPath)
-
+	var cfg Config
+	err = yaml.Unmarshal(config_file, &cfg)
 	if err != nil {
-		panic(err)
+		panic(fmt.Sprintf("Can not parse config file, error: %s", err))
 	}
+	return &cfg
+}
 
-	var cfg ConfigStruct
-
-	err = yaml.Unmarshal(file, &cfg)
-	if err != nil {
-		panic(err)
-	}
+func (cfg *Config) GetDataBaseUrl() string {
 	db_url := "postgresql://" + cfg.Db.Host + ":" + cfg.Db.Port + "/" + cfg.Db.Name + "?user=" + cfg.Db.User + "&password=" + cfg.Db.Pass
 	return db_url
 }

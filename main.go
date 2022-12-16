@@ -13,8 +13,11 @@ func main() {
 	confPtr := flag.String("config", "./config.yaml", "config file path")
 	flag.Parse()
 
+	conf := utils.ReadConfig(*confPtr)
+	db_url := conf.GetDataBaseUrl()
+
 	app := framework.NewApp()
-	db_url := utils.GetDataBaseUrl(*confPtr)
+	//db_url := utils.GetDataBaseUrl(*confPtr)
 	db_pool := db.NewPool(db_url)
 	defer db_pool.Close()
 
