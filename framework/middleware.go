@@ -31,7 +31,7 @@ func BoardExists() gin.HandlerFunc {
 	}
 }
 
-func SetupMiddlewares(app *gin.Engine) {
-	app.Use(gin.Logger())
-	app.Use(gin.Recovery())
-}
+// func SetupMiddlewares(app *gin.Engine) {
+// 	app.Use(gin.Logger())
+// 	app.Use(gin.Recovery())
+// }
