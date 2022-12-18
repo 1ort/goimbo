@@ -63,7 +63,7 @@ func ApplyHandlers(app *gin.Engine) {
 	board.GET("/:page", get_page)
 	board.GET("/thread/:op", get_thread)
 	board.POST("/newpost", NewPost)
-	app.GET("/newboard", NewBoard)
+	app.POST("/newboard", NewBoard)
 	//app.GET("/:board/", get_board_index)
 	// By default it serves on :8080 unless a
 	// PORT environment variable was defined.
