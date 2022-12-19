@@ -1,16 +1,16 @@
 package model
 
 type BoardRepository interface {
-	NewBoard(slug, name, descr string) (b *Board, err error)
-	GetBoard(slug string) (b *Board, err error)
-	GetBoardList() (l []*Board, err error)
-	IsExists(slug string) (exists bool, err error)
+	NewBoard(slug, name, descr string) (*Board, error)
+	GetBoard(slug string) (*Board, error)
+	GetBoardList() ([]*Board, error)
+	IsBoardExists(slug string) (bool, error)
 }
 
 type PostRepository interface {
-	NewPost(resto int, board, com string) (p *Post, err error)
-	GetPost(no int, board string) (p *Post, err error)
-	GetThreadHistory(no int, board string)
-	DeletePost(no int, board string) (deleted bool, err error)
-	IsOp(no int, board string) (isop bool, err error)
+	NewPost(resto int, board, com string) (*Post, error)
+	GetPost(no int, board string) (*Post, error)
+	GetThreadHistory(no int, board string) ([]*Post, error)
+	DeletePost(no int, board string) (bool, error)
+	IsOp(no int, board string) (bool, error)
 }
