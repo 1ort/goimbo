@@ -5,7 +5,6 @@ import (
 
 	//"github.com/1ort/goimbo/db"
 	"github.com/1ort/goimbo/handler"
-	"github.com/1ort/goimbo/utils"
 	"github.com/gin-gonic/gin"
 )
 
@@ -13,7 +12,7 @@ func main() {
 	confPtr := flag.String("config", "config.yaml", "config file path")
 	flag.Parse()
 
-	config := utils.ReadConfig(*confPtr) //TODO: перенести ReadConfig в пакет main, т.к. он используется только тут
+	config := ReadConfig(*confPtr)
 	// db_url := config.GetDataBaseUrl()
 
 	//app := framework.NewApp()
