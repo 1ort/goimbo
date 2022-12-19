@@ -15,11 +15,11 @@ func DBConnPool(pool *pgxpool.Pool) gin.HandlerFunc {
 	}
 }
 
-func BoardExists() gin.HandlerFunc {
+func IsBoardExists() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		db_pool := c.MustGet("db").(*pgxpool.Pool)
 		board := c.Param("board")
-		res, err := db.BoardExists(db_pool, board)
+		res, err := db.SelectBoardExists(db_pool, board)
 		if err != nil {
 			c.AbortWithStatus(http.StatusInternalServerError)
 		} else if !res {

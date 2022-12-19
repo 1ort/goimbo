@@ -7,7 +7,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func NewBoard(pool *pgxpool.Pool, slug string, name string, descr string) error {
+func InsertBoard(pool *pgxpool.Pool, slug string, name string, descr string) error {
 	new_board_query := `
 	INSERT INTO board (slug, name, descr) VALUES
 	($1, $2, $3)
@@ -27,16 +27,17 @@ func NewBoard(pool *pgxpool.Pool, slug string, name string, descr string) error 
 	return nil
 }
 
-func BoardExists(pool *pgxpool.Pool, slug string) (bool, error) {
+func SelectBoardExists(pool *pgxpool.Pool, slug string) (bool, error) {
 	query_template := `
 	SELECT EXISTS(SELECT 1 FROM board WHERE slug=$1)
 	`
 	rows, query_err := pool.Query(context.Background(), query_template, slug)
-	defer rows.Close()
 	if query_err != nil {
 		fmt.Printf("%e", query_err)
 		return false, query_err
 	}
+	defer rows.Close()
+
 	var outs []bool
 	for rows.Next() {
 		var val bool

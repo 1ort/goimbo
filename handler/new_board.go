@@ -16,7 +16,7 @@ func NewBoard(c *gin.Context) {
 	name := c.DefaultQuery("name", slug)
 	descr := c.DefaultQuery("descr", "New board")
 
-	err := db.NewBoard(db_pool, slug, name, descr)
+	err := db.InsertBoard(db_pool, slug, name, descr)
 	if err != nil {
 		fmt.Printf("%e", err)
 		c.String(http.StatusInternalServerError, "Can not create new board %s", slug)

@@ -7,7 +7,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func NewPool(database_url string) *pgxpool.Pool {
+func InitPool(database_url string) *pgxpool.Pool {
 	dbpool, err := pgxpool.New(context.Background(), database_url)
 	if err != nil {
 		panic(fmt.Sprintf("Unable to create connection pool: %v\n", err))

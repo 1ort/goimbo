@@ -7,7 +7,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func NewPost(pool *pgxpool.Pool, resto int, board string, com string) error {
+func InsertPost(pool *pgxpool.Pool, resto int, board string, com string) error {
 	query_template := `
 	INSERT INTO post (no, resto, board, com, time) SELECT
 	MAX (no) + 1, $1, $2, $3, NOW() FROM post
@@ -26,11 +26,11 @@ func IsOp(pool *pgxpool.Pool, board string, no int) bool {
 	SELECT EXISTS(SELECT 1 FROM post WHERE board=$1 and no=$2 and resto=0)
 	`
 	rows, query_err := pool.Query(context.Background(), query_template, board, no)
-	defer rows.Close()
 	if query_err != nil {
 		fmt.Printf("%e", query_err)
 		return false
 	}
+	defer rows.Close()
 	var outs []bool
 	for rows.Next() {
 		var val bool

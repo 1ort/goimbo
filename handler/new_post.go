@@ -32,7 +32,7 @@ func NewPost(c *gin.Context) {
 	buf.ReadFrom(c.Request.Body)
 	com := buf.String()
 
-	err = db.NewPost(db_pool, resto, board, com)
+	err = db.InsertPost(db_pool, resto, board, com)
 	if err != nil {
 		fmt.Printf("%e", err)
 		c.String(http.StatusInternalServerError, "Can not post")
