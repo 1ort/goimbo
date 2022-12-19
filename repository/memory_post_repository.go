@@ -54,6 +54,16 @@ func (self *MemoryPostRepository) GetThreadHistory(no int, board string) ([]*Pos
 	if _, err := self.BoardRepo.GetBoard(board); err != nil {
 		return nil, err
 	}
+
+	isop, err := self.IsOp(no, board)
+	if err != nil {
+		return nil, err
+	}
+
+	if !isop {
+		return nil, model.NewBadRequest(fmt.Sprintf("post %v on board %v is not OP", no, board))
+	}
+
 	var posts []*Post
 	for _, p := range self.Posts[board] {
 		if p.No == no || p.Resto == no {
