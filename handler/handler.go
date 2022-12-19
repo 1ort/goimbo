@@ -22,6 +22,7 @@ func NewHandler(cfg *HandlerConfig) {
 	api := cfg.R.Group(cfg.BaseUrl)
 
 	board := api.Group("/:board")
+	//board.Use(Checkboardmiddleware)
 
 	board.GET("/threads", h.get_threads)
 	board.GET("/catalog", h.get_catalog)
