@@ -19,8 +19,12 @@ func (self *MemoryPostRepository) NewPost(resto int, board, com string) (*Post, 
 		return nil, err
 	}
 	if resto != 0 {
-		if _, err := self.GetPost(resto, board); err != nil {
+		isop, err := self.IsOp(resto, board)
+		if err != nil {
 			return nil, err
+		}
+		if !isop {
+			return nil, model.NewBadRequest(fmt.Sprintf("post %v on board %v is not OP", resto, board))
 		}
 	}
 	p := &Post{
@@ -35,6 +39,9 @@ func (self *MemoryPostRepository) NewPost(resto int, board, com string) (*Post, 
 }
 
 func (self *MemoryPostRepository) GetPost(no int, board string) (*Post, error) {
+	if _, err := self.BoardRepo.GetBoard(board); err != nil {
+		return nil, err
+	}
 	for _, p := range self.Posts[board] {
 		if p.No == no {
 			return p, nil
@@ -44,6 +51,9 @@ func (self *MemoryPostRepository) GetPost(no int, board string) (*Post, error) {
 }
 
 func (self *MemoryPostRepository) GetThreadHistory(no int, board string) ([]*Post, error) {
+	if _, err := self.BoardRepo.GetBoard(board); err != nil {
+		return nil, err
+	}
 	var posts []*Post
 	for _, p := range self.Posts[board] {
 		if p.No == no || p.Resto == no {
@@ -54,9 +64,12 @@ func (self *MemoryPostRepository) GetThreadHistory(no int, board string) ([]*Pos
 }
 
 func (self *MemoryPostRepository) DeletePost(no int, board string) (bool, error) {
-	for i, p := range self.Posts[board] {
+	if _, err := self.BoardRepo.GetBoard(board); err != nil {
+		return false, err
+	}
+	for _, p := range self.Posts[board] {
 		if p.No == no {
-			self.Posts[board] = append(self.Posts[board][:i], self.Posts[board][i+1:]...)
+			p.Com = "content deleted"
 			return true, nil
 		}
 	}
@@ -64,6 +77,9 @@ func (self *MemoryPostRepository) DeletePost(no int, board string) (bool, error)
 }
 
 func (self *MemoryPostRepository) IsOp(no int, board string) (bool, error) {
+	if _, err := self.BoardRepo.GetBoard(board); err != nil {
+		return false, err
+	}
 	for _, p := range self.Posts[board] {
 		if p.No == no {
 			return p.Resto == 0, nil
