@@ -1,11 +1,11 @@
 package model
 
 type Post struct {
-	No    int32  `db:"no" json:"no"`
-	Resto int32  `db:"resto" json:"resto"`
+	No    int    `db:"no" json:"no"`
+	Resto int    `db:"resto" json:"resto"`
 	Board string `db:"board" json:"board"`
 	Com   string `db:"com" json:"com"`
-	Time  int32  `db:"time" json:"time"`
+	Time  int    `db:"time" json:"time"`
 }
 
 /*
