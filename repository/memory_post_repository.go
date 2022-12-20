@@ -8,15 +8,28 @@ import (
 	"github.com/1ort/goimbo/model"
 )
 
-type Post model.Post
-
 type MemoryPostRepository struct {
 	BoardRepo model.BoardRepository
-	Posts     map[string][]*Post
+	Posts     map[string][]*model.Post
 	mutex     sync.Mutex
 }
 
-func (self *MemoryPostRepository) NewPost(resto int, board, com string) (*Post, error) {
+func (self *MemoryPostRepository) GetThreadList(board string) ([]*model.Post, error) {
+	if _, err := self.BoardRepo.GetBoard(board); err != nil {
+		return nil, err
+	}
+	self.mutex.Lock()
+	defer self.mutex.Unlock()
+	var posts []*model.Post
+	for _, p := range self.Posts[board] {
+		if p.Resto == 0 {
+			posts = append(posts, p)
+		}
+	}
+	return posts, nil
+}
+
+func (self *MemoryPostRepository) NewPost(resto int, board, com string) (*model.Post, error) {
 	if _, err := self.BoardRepo.GetBoard(board); err != nil {
 		return nil, err
 	}
@@ -31,7 +44,7 @@ func (self *MemoryPostRepository) NewPost(resto int, board, com string) (*Post, 
 	}
 	self.mutex.Lock()
 	defer self.mutex.Unlock()
-	p := &Post{
+	p := &model.Post{
 		No:    len(self.Posts[board]) + 1,
 		Resto: resto,
 		Board: board,
@@ -42,7 +55,7 @@ func (self *MemoryPostRepository) NewPost(resto int, board, com string) (*Post, 
 	return p, nil
 }
 
-func (self *MemoryPostRepository) GetPost(no int, board string) (*Post, error) {
+func (self *MemoryPostRepository) GetPost(no int, board string) (*model.Post, error) {
 	if _, err := self.BoardRepo.GetBoard(board); err != nil {
 		return nil, err
 	}
@@ -56,7 +69,7 @@ func (self *MemoryPostRepository) GetPost(no int, board string) (*Post, error) {
 	return nil, model.NewNotFound("post", fmt.Sprintf("%d", no))
 }
 
-func (self *MemoryPostRepository) GetThreadHistory(no int, board string) ([]*Post, error) {
+func (self *MemoryPostRepository) GetThreadHistory(no int, board string) ([]*model.Post, error) {
 	if _, err := self.BoardRepo.GetBoard(board); err != nil {
 		return nil, err
 	}
@@ -72,7 +85,7 @@ func (self *MemoryPostRepository) GetThreadHistory(no int, board string) ([]*Pos
 
 	self.mutex.Lock()
 	defer self.mutex.Unlock()
-	var posts []*Post
+	var posts []*model.Post
 	for _, p := range self.Posts[board] {
 		if p.No == no || p.Resto == no {
 			posts = append(posts, p)

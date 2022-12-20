@@ -6,18 +6,16 @@ import (
 	"github.com/1ort/goimbo/model"
 )
 
-type Board model.Board
-
 type MemoryBoardRepository struct {
-	Boards []*Board
+	Boards []*model.Board
 	mutex  sync.Mutex
 }
 
-func (self *MemoryBoardRepository) NewBoard(slug, name, descr string) (*Board, error) {
+func (self *MemoryBoardRepository) NewBoard(slug, name, descr string) (*model.Board, error) {
 	if ex, _ := self.IsBoardExists(slug); ex {
 		return nil, model.NewConflict("board", slug)
 	}
-	b := &Board{
+	b := &model.Board{
 		Slug:  slug,
 		Name:  name,
 		Descr: descr,
@@ -28,7 +26,7 @@ func (self *MemoryBoardRepository) NewBoard(slug, name, descr string) (*Board, e
 	return b, nil
 }
 
-func (self *MemoryBoardRepository) GetBoard(slug string) (*Board, error) {
+func (self *MemoryBoardRepository) GetBoard(slug string) (*model.Board, error) {
 	self.mutex.Lock()
 	defer self.mutex.Unlock()
 	for _, b := range self.Boards {
@@ -50,7 +48,7 @@ func (self *MemoryBoardRepository) IsBoardExists(slug string) (bool, error) {
 	return false, nil
 }
 
-func (self *MemoryBoardRepository) GetBoardList() ([]*Board, error) {
+func (self *MemoryBoardRepository) GetBoardList() ([]*model.Board, error) {
 	self.mutex.Lock()
 	defer self.mutex.Unlock()
 	return self.Boards, nil
