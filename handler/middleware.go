@@ -1,12 +1,4 @@
-package middleware
-
-// import (
-// 	"net/http"
-
-// 	"github.com/1ort/goimbo/db"
-// 	"github.com/gin-gonic/gin"
-// 	"github.com/jackc/pgx/v5/pgxpool"
-// )
+package handler
 
 // func DBConnPool(pool *pgxpool.Pool) gin.HandlerFunc {
 // 	return func(c *gin.Context) {
@@ -34,4 +26,11 @@ package middleware
 // func SetupMiddlewares(app *gin.Engine) {
 // 	app.Use(gin.Logger())
 // 	app.Use(gin.Recovery())
+// }
+
+// func PassConf(cfg *HandlerConfig) gin.HandlerFunc {
+// 	return func(c *gin.Context) {
+// 		c.Set("cfg", cfg)
+// 		c.Next()
+// 	}
 // }

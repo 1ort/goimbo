@@ -5,48 +5,74 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/1ort/goimbo/model"
 	"github.com/gin-gonic/gin"
 )
 
 // Будет содержать всякие штуки типа коннектов к ДБ и хранилищ куки
-type Handler struct{}
+type Handler struct {
+	boardRepo model.BoardRepository
+	postRepo  model.PostRepository
+}
 
 // Сюда будем передавать всё что нужно для инициализации хандлера
 type HandlerConfig struct {
-	R       *gin.Engine //router
-	BaseUrl string
+	R         *gin.Engine //router
+	BaseUrl   string
+	BoardRepo model.BoardRepository
+	PostRepo  model.PostRepository
 }
 
 func NewHandler(cfg *HandlerConfig) {
-	h := &Handler{}
+	h := &Handler{
+		boardRepo: cfg.BoardRepo,
+		postRepo:  cfg.PostRepo,
+	}
 	api := cfg.R.Group(cfg.BaseUrl)
+	api.GET("/boards", h.get_boards)
 
 	board := api.Group("/:board")
-	//board.Use(Checkboardmiddleware)
-
 	board.GET("/threads", h.get_threads)
 	board.GET("/catalog", h.get_catalog)
 	board.GET("/archive", h.get_archive)
 	board.GET("/:page", h.get_page)
 	board.GET("/thread/:op", h.get_thread)
 
+	//board.Use(Checkboardmiddleware)
 	//board.POST("/newpost", h.NewPost)
 	//api.POST("/newboard", h.NewBoard)
 
 }
 
 func (h *Handler) get_boards(c *gin.Context) {
+	boardList, err := h.boardRepo.GetBoardList()
+	if err != nil {
+		c.JSON(model.Status(err), gin.H{
+			"status": model.Status(err),
+			"result": err,
+		})
+		return
+	}
 	c.JSON(http.StatusOK, gin.H{
 		"status": http.StatusOK,
-		"result": "board list here",
+		"result": boardList,
 	})
 }
 
 func (h *Handler) get_threads(c *gin.Context) {
 	board := c.Param("board")
+	rawThreadList, err := h.postRepo.GetThreadList(board)
+	threadList := append(make([]*model.Post, 0), rawThreadList...)
+	if err != nil {
+		c.JSON(model.Status(err), gin.H{
+			"status": model.Status(err),
+			"result": err,
+		})
+		return
+	}
 	c.JSON(http.StatusOK, gin.H{
 		"status": http.StatusOK,
-		"result": fmt.Sprintf("Thread list on %s board here", board),
+		"result": threadList,
 	})
 
 }
