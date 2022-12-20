@@ -11,22 +11,20 @@ import (
 
 // Будет содержать всякие штуки типа коннектов к ДБ и хранилищ куки
 type Handler struct {
-	boardRepo model.BoardRepository
-	postRepo  model.PostRepository
+	userspace model.Userspace
+	//postRepo  model.PostRepository
 }
 
 // Сюда будем передавать всё что нужно для инициализации хандлера
 type HandlerConfig struct {
 	R         *gin.Engine //router
 	BaseUrl   string
-	BoardRepo model.BoardRepository
-	PostRepo  model.PostRepository
+	Userspace model.Userspace
 }
 
 func NewHandler(cfg *HandlerConfig) {
 	h := &Handler{
-		boardRepo: cfg.BoardRepo,
-		postRepo:  cfg.PostRepo,
+		userspace: cfg.Userspace,
 	}
 	api := cfg.R.Group(cfg.BaseUrl)
 	api.GET("/boards", h.get_boards)
@@ -46,7 +44,7 @@ func NewHandler(cfg *HandlerConfig) {
 
 func (h *Handler) get_boards(c *gin.Context) {
 	ctx := c.Request.Context()
-	boardList, err := h.boardRepo.GetBoardList(ctx)
+	boardList, err := h.userspace.Boards(ctx)
 	if err != nil {
 		c.JSON(model.Status(err), gin.H{
 			"status": model.Status(err),
@@ -63,8 +61,9 @@ func (h *Handler) get_boards(c *gin.Context) {
 func (h *Handler) get_threads(c *gin.Context) {
 	ctx := c.Request.Context()
 	board := c.Param("board")
-	rawThreadList, err := h.postRepo.GetThreadList(ctx, board)
-	threadList := append(make([]*model.Post, 0), rawThreadList...)
+	//rawThreadList, err := h.postRepo.GetThreadList(ctx, board)
+	//threadList := append(make([]*model.Post, 0), rawThreadList...)
+	threadList, err := h.userspace.Threads(ctx, board)
 	if err != nil {
 		c.JSON(model.Status(err), gin.H{
 			"status": model.Status(err),

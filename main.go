@@ -6,6 +6,7 @@ import (
 	"github.com/1ort/goimbo/handler"
 	"github.com/1ort/goimbo/model"
 	"github.com/1ort/goimbo/repository"
+	"github.com/1ort/goimbo/service"
 	"github.com/gin-gonic/gin"
 )
 
@@ -42,31 +43,25 @@ func main() {
 	boardRepo := repository.NewMemoryBoardRepository(
 		&repository.MemoryBoardRepositoryConfig{
 			Boards: init_boards,
-		},
-	)
+		})
+
 	postRepo := repository.NewMemoryPostRepository(
 		&repository.MemoryPostRepositoryConfig{
-			BoardRepo: boardRepo,
-			Posts:     make(map[string][]*model.Post),
-		},
-	)
+			Posts: make(map[string][]*model.Post),
+		})
 
-	handlerConfig := handler.HandlerConfig{
-		R:         router,
-		BaseUrl:   config.GetBaseApiUrl(),
-		BoardRepo: boardRepo,
-		PostRepo:  postRepo,
-	}
+	userspace := service.NewUserspaceService(
+		&service.UserspaceServiceConfig{
+			PostRepository:  postRepo,
+			BoardRepository: boardRepo,
+		})
 
-	handler.NewHandler(&handlerConfig)
+	handler.NewHandler(
+		&handler.HandlerConfig{
+			R:         router,
+			BaseUrl:   config.GetBaseApiUrl(),
+			Userspace: userspace,
+		})
 
 	router.Run(config.GetAppAddr())
-
-	// db.InitDatabase(db_pool)
-
-	//framework.SetupMiddlewares(app)
-	//app.Use(framework.DBConnPool(db_pool))
-
-	//handler.ApplyHandlers(app)
-	//framework.RunServer(app, config.GetAppAddr())
 }
