@@ -31,7 +31,6 @@ type CatalogThread struct {
 	Post
 	LastReplies  []Post `json:"last_replies"`
 	LastModified int    `json:"last_modified"`
-	Bumplimit    bool   `json:"bumplimit"`
 }
 
 type CatalogPage struct {
