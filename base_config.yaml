@@ -7,3 +7,5 @@ db:
 app:
   host: localhost #hostname
   port: 3000 #webserver port
+api:
+  base_url: /api

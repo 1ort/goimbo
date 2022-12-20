@@ -1,4 +1,4 @@
-package utils
+package main
 
 import (
 	"fmt"
@@ -11,6 +11,9 @@ type Config struct {
 	App struct {
 		Host string `yaml:"host"`
 		Port string `yaml:"port"`
+	}
+	Api struct {
+		BaseUrl string `yaml:"base_url"`
 	}
 	Db struct {
 		Host string `yaml:"host"`
@@ -44,4 +47,8 @@ func (cfg *Config) GetAppAddr() string {
 	addr_template := "%s:%s"
 	addr := fmt.Sprintf(addr_template, cfg.App.Host, cfg.App.Port)
 	return addr
+}
+
+func (cfg *Config) GetBaseApiUrl() string {
+	return (cfg.Api.BaseUrl)
 }

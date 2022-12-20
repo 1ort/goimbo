@@ -3,28 +3,65 @@ package main
 import (
 	"flag"
 
-	"github.com/1ort/goimbo/db"
-	"github.com/1ort/goimbo/framework"
 	"github.com/1ort/goimbo/handler"
-	"github.com/1ort/goimbo/utils"
+	"github.com/1ort/goimbo/model"
+	"github.com/1ort/goimbo/repository"
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
 	confPtr := flag.String("config", "config.yaml", "config file path")
 	flag.Parse()
+	config := ReadConfig(*confPtr)
 
-	config := utils.ReadConfig(*confPtr)
-	db_url := config.GetDataBaseUrl()
+	router := gin.Default()
 
-	app := framework.NewApp()
-	db_pool := db.NewPool(db_url)
-	defer db_pool.Close()
+	init_boards := []*model.Board{
+		{
+			Slug:  "po",
+			Name:  "Politics",
+			Descr: "Политика",
+		},
+		{
+			Slug:  "b",
+			Name:  "bред",
+			Descr: "Бредач",
+		},
+		{
+			Slug:  "r",
+			Name:  "Random",
+			Descr: "Рандомач",
+		},
+		{
+			Slug:  "vg",
+			Name:  "Video games general",
+			Descr: "Майнкрафт и дота",
+		},
+	}
 
-	db.InitDatabase(db_pool)
+	boardRepo := repository.MemoryBoardRepository{
+		Boards: init_boards,
+	}
+	postRepo := repository.MemoryPostRepository{
+		BoardRepo: &boardRepo,
+	}
 
-	framework.SetupMiddlewares(app)
-	app.Use(framework.DBConnPool(db_pool))
+	handlerConfig := handler.HandlerConfig{
+		R:         router,
+		BaseUrl:   config.GetBaseApiUrl(),
+		BoardRepo: &boardRepo,
+		PostRepo:  &postRepo,
+	}
 
-	handler.ApplyHandlers(app)
-	framework.RunServer(app, config.GetAppAddr())
+	handler.NewHandler(&handlerConfig)
+
+	router.Run(config.GetAppAddr())
+
+	// db.InitDatabase(db_pool)
+
+	//framework.SetupMiddlewares(app)
+	//app.Use(framework.DBConnPool(db_pool))
+
+	//handler.ApplyHandlers(app)
+	//framework.RunServer(app, config.GetAppAddr())
 }
