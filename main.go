@@ -39,18 +39,23 @@ func main() {
 		},
 	}
 
-	boardRepo := repository.MemoryBoardRepository{
-		Boards: init_boards,
-	}
-	postRepo := repository.MemoryPostRepository{
-		BoardRepo: &boardRepo,
-	}
+	boardRepo := repository.NewMemoryBoardRepository(
+		&repository.MemoryBoardRepositoryConfig{
+			Boards: init_boards,
+		},
+	)
+	postRepo := repository.NewMemoryPostRepository(
+		&repository.MemoryPostRepositoryConfig{
+			BoardRepo: boardRepo,
+			Posts:     make(map[string][]*model.Post),
+		},
+	)
 
 	handlerConfig := handler.HandlerConfig{
 		R:         router,
 		BaseUrl:   config.GetBaseApiUrl(),
-		BoardRepo: &boardRepo,
-		PostRepo:  &postRepo,
+		BoardRepo: boardRepo,
+		PostRepo:  postRepo,
 	}
 
 	handler.NewHandler(&handlerConfig)
