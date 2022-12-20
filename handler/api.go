@@ -28,8 +28,6 @@ func (h *Handler) get_boards(c *gin.Context) {
 func (h *Handler) get_threads(c *gin.Context) {
 	ctx := c.Request.Context()
 	board := c.Param("board")
-	//rawThreadList, err := h.postRepo.GetThreadList(ctx, board)
-	//threadList := append(make([]*model.Post, 0), rawThreadList...)
 	threadList, err := h.userspace.Threads(ctx, board)
 	if err != nil {
 		c.JSON(model.Status(err), gin.H{
