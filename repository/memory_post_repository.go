@@ -10,28 +10,22 @@ import (
 )
 
 type memoryPostRepository struct {
-	BoardRepo model.BoardRepository
-	Posts     map[string][]*model.Post
-	mutex     sync.Mutex
+	Posts map[string][]*model.Post
+	mutex sync.Mutex
 }
 
 type MemoryPostRepositoryConfig struct {
-	BoardRepo model.BoardRepository
-	Posts     map[string][]*model.Post
+	Posts map[string][]*model.Post
 }
 
 func NewMemoryPostRepository(c *MemoryPostRepositoryConfig) model.PostRepository {
 	return &memoryPostRepository{
-		BoardRepo: c.BoardRepo,
-		Posts:     c.Posts,
-		mutex:     sync.Mutex{},
+		Posts: c.Posts,
+		mutex: sync.Mutex{},
 	}
 }
 
 func (self *memoryPostRepository) GetThreadList(ctx context.Context, board string) ([]*model.Post, error) {
-	if _, err := self.BoardRepo.GetBoard(ctx, board); err != nil {
-		return nil, err
-	}
 	self.mutex.Lock()
 	defer self.mutex.Unlock()
 	var posts []*model.Post
@@ -44,9 +38,6 @@ func (self *memoryPostRepository) GetThreadList(ctx context.Context, board strin
 }
 
 func (self *memoryPostRepository) NewPost(ctx context.Context, resto int, board, com string) (*model.Post, error) {
-	if _, err := self.BoardRepo.GetBoard(ctx, board); err != nil {
-		return nil, err
-	}
 	if resto != 0 {
 		isop, err := self.IsOp(ctx, resto, board)
 		if err != nil {
@@ -70,9 +61,6 @@ func (self *memoryPostRepository) NewPost(ctx context.Context, resto int, board,
 }
 
 func (self *memoryPostRepository) GetPost(ctx context.Context, no int, board string) (*model.Post, error) {
-	if _, err := self.BoardRepo.GetBoard(ctx, board); err != nil {
-		return nil, err
-	}
 	self.mutex.Lock()
 	defer self.mutex.Unlock()
 	for _, p := range self.Posts[board] {
@@ -84,10 +72,6 @@ func (self *memoryPostRepository) GetPost(ctx context.Context, no int, board str
 }
 
 func (self *memoryPostRepository) GetThreadHistory(ctx context.Context, no int, board string) ([]*model.Post, error) {
-	if _, err := self.BoardRepo.GetBoard(ctx, board); err != nil {
-		return nil, err
-	}
-
 	isop, err := self.IsOp(ctx, no, board)
 	if err != nil {
 		return nil, err
@@ -109,9 +93,6 @@ func (self *memoryPostRepository) GetThreadHistory(ctx context.Context, no int, 
 }
 
 func (self *memoryPostRepository) DeletePost(ctx context.Context, no int, board string) (bool, error) {
-	if _, err := self.BoardRepo.GetBoard(ctx, board); err != nil {
-		return false, err
-	}
 	self.mutex.Lock()
 	defer self.mutex.Unlock()
 	for _, p := range self.Posts[board] {
@@ -124,9 +105,6 @@ func (self *memoryPostRepository) DeletePost(ctx context.Context, no int, board 
 }
 
 func (self *memoryPostRepository) IsOp(ctx context.Context, no int, board string) (bool, error) {
-	if _, err := self.BoardRepo.GetBoard(ctx, board); err != nil {
-		return false, err
-	}
 	self.mutex.Lock()
 	defer self.mutex.Unlock()
 	for _, p := range self.Posts[board] {
