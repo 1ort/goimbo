@@ -3,6 +3,8 @@ package repository
 import (
 	"sync"
 
+	"context"
+
 	"github.com/1ort/goimbo/model"
 )
 
@@ -11,8 +13,8 @@ type MemoryBoardRepository struct {
 	mutex  sync.Mutex
 }
 
-func (self *MemoryBoardRepository) NewBoard(slug, name, descr string) (*model.Board, error) {
-	if ex, _ := self.IsBoardExists(slug); ex {
+func (self *MemoryBoardRepository) NewBoard(ctx context.Context, slug, name, descr string) (*model.Board, error) {
+	if ex, _ := self.IsBoardExists(ctx, slug); ex {
 		return nil, model.NewConflict("board", slug)
 	}
 	b := &model.Board{
@@ -26,7 +28,7 @@ func (self *MemoryBoardRepository) NewBoard(slug, name, descr string) (*model.Bo
 	return b, nil
 }
 
-func (self *MemoryBoardRepository) GetBoard(slug string) (*model.Board, error) {
+func (self *MemoryBoardRepository) GetBoard(ctx context.Context, slug string) (*model.Board, error) {
 	self.mutex.Lock()
 	defer self.mutex.Unlock()
 	for _, b := range self.Boards {
@@ -37,7 +39,7 @@ func (self *MemoryBoardRepository) GetBoard(slug string) (*model.Board, error) {
 	return nil, model.NewNotFound("board", slug)
 }
 
-func (self *MemoryBoardRepository) IsBoardExists(slug string) (bool, error) {
+func (self *MemoryBoardRepository) IsBoardExists(ctx context.Context, slug string) (bool, error) {
 	self.mutex.Lock()
 	defer self.mutex.Unlock()
 	for _, b := range self.Boards {
@@ -48,7 +50,7 @@ func (self *MemoryBoardRepository) IsBoardExists(slug string) (bool, error) {
 	return false, nil
 }
 
-func (self *MemoryBoardRepository) GetBoardList() ([]*model.Board, error) {
+func (self *MemoryBoardRepository) GetBoardList(ctx context.Context) ([]*model.Board, error) {
 	self.mutex.Lock()
 	defer self.mutex.Unlock()
 	return self.Boards, nil

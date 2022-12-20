@@ -45,7 +45,8 @@ func NewHandler(cfg *HandlerConfig) {
 }
 
 func (h *Handler) get_boards(c *gin.Context) {
-	boardList, err := h.boardRepo.GetBoardList()
+	ctx := c.Request.Context()
+	boardList, err := h.boardRepo.GetBoardList(ctx)
 	if err != nil {
 		c.JSON(model.Status(err), gin.H{
 			"status": model.Status(err),
@@ -60,8 +61,9 @@ func (h *Handler) get_boards(c *gin.Context) {
 }
 
 func (h *Handler) get_threads(c *gin.Context) {
+	ctx := c.Request.Context()
 	board := c.Param("board")
-	rawThreadList, err := h.postRepo.GetThreadList(board)
+	rawThreadList, err := h.postRepo.GetThreadList(ctx, board)
 	threadList := append(make([]*model.Post, 0), rawThreadList...)
 	if err != nil {
 		c.JSON(model.Status(err), gin.H{

@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"fmt"
 	"sync"
 	"time"
@@ -14,8 +15,8 @@ type MemoryPostRepository struct {
 	mutex     sync.Mutex
 }
 
-func (self *MemoryPostRepository) GetThreadList(board string) ([]*model.Post, error) {
-	if _, err := self.BoardRepo.GetBoard(board); err != nil {
+func (self *MemoryPostRepository) GetThreadList(ctx context.Context, board string) ([]*model.Post, error) {
+	if _, err := self.BoardRepo.GetBoard(ctx, board); err != nil {
 		return nil, err
 	}
 	self.mutex.Lock()
@@ -29,12 +30,12 @@ func (self *MemoryPostRepository) GetThreadList(board string) ([]*model.Post, er
 	return posts, nil
 }
 
-func (self *MemoryPostRepository) NewPost(resto int, board, com string) (*model.Post, error) {
-	if _, err := self.BoardRepo.GetBoard(board); err != nil {
+func (self *MemoryPostRepository) NewPost(ctx context.Context, resto int, board, com string) (*model.Post, error) {
+	if _, err := self.BoardRepo.GetBoard(ctx, board); err != nil {
 		return nil, err
 	}
 	if resto != 0 {
-		isop, err := self.IsOp(resto, board)
+		isop, err := self.IsOp(ctx, resto, board)
 		if err != nil {
 			return nil, err
 		}
@@ -55,8 +56,8 @@ func (self *MemoryPostRepository) NewPost(resto int, board, com string) (*model.
 	return p, nil
 }
 
-func (self *MemoryPostRepository) GetPost(no int, board string) (*model.Post, error) {
-	if _, err := self.BoardRepo.GetBoard(board); err != nil {
+func (self *MemoryPostRepository) GetPost(ctx context.Context, no int, board string) (*model.Post, error) {
+	if _, err := self.BoardRepo.GetBoard(ctx, board); err != nil {
 		return nil, err
 	}
 	self.mutex.Lock()
@@ -69,12 +70,12 @@ func (self *MemoryPostRepository) GetPost(no int, board string) (*model.Post, er
 	return nil, model.NewNotFound("post", fmt.Sprintf("%d", no))
 }
 
-func (self *MemoryPostRepository) GetThreadHistory(no int, board string) ([]*model.Post, error) {
-	if _, err := self.BoardRepo.GetBoard(board); err != nil {
+func (self *MemoryPostRepository) GetThreadHistory(ctx context.Context, no int, board string) ([]*model.Post, error) {
+	if _, err := self.BoardRepo.GetBoard(ctx, board); err != nil {
 		return nil, err
 	}
 
-	isop, err := self.IsOp(no, board)
+	isop, err := self.IsOp(ctx, no, board)
 	if err != nil {
 		return nil, err
 	}
@@ -94,8 +95,8 @@ func (self *MemoryPostRepository) GetThreadHistory(no int, board string) ([]*mod
 	return posts, nil
 }
 
-func (self *MemoryPostRepository) DeletePost(no int, board string) (bool, error) {
-	if _, err := self.BoardRepo.GetBoard(board); err != nil {
+func (self *MemoryPostRepository) DeletePost(ctx context.Context, no int, board string) (bool, error) {
+	if _, err := self.BoardRepo.GetBoard(ctx, board); err != nil {
 		return false, err
 	}
 	self.mutex.Lock()
@@ -109,8 +110,8 @@ func (self *MemoryPostRepository) DeletePost(no int, board string) (bool, error)
 	return false, model.NewNotFound("post", fmt.Sprintf("%d", no))
 }
 
-func (self *MemoryPostRepository) IsOp(no int, board string) (bool, error) {
-	if _, err := self.BoardRepo.GetBoard(board); err != nil {
+func (self *MemoryPostRepository) IsOp(ctx context.Context, no int, board string) (bool, error) {
+	if _, err := self.BoardRepo.GetBoard(ctx, board); err != nil {
 		return false, err
 	}
 	self.mutex.Lock()

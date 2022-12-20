@@ -1,17 +1,21 @@
 package model
 
+import (
+	"context"
+)
+
 type BoardRepository interface {
-	NewBoard(slug, name, descr string) (*Board, error)
-	GetBoard(slug string) (*Board, error)
-	GetBoardList() ([]*Board, error)
-	IsBoardExists(slug string) (bool, error)
+	NewBoard(ctx context.Context, slug, name, descr string) (*Board, error)
+	GetBoard(ctx context.Context, slug string) (*Board, error)
+	GetBoardList(ctx context.Context) ([]*Board, error)
+	IsBoardExists(ctx context.Context, slug string) (bool, error)
 }
 
 type PostRepository interface {
-	NewPost(resto int, board, com string) (*Post, error)
-	GetPost(no int, board string) (*Post, error)
-	GetThreadHistory(no int, board string) ([]*Post, error)
-	GetThreadList(board string) ([]*Post, error)
-	DeletePost(no int, board string) (bool, error)
-	IsOp(no int, board string) (bool, error)
+	NewPost(ctx context.Context, resto int, board, com string) (*Post, error)
+	GetPost(ctx context.Context, no int, board string) (*Post, error)
+	GetThreadHistory(ctx context.Context, no int, board string) ([]*Post, error)
+	GetThreadList(ctx context.Context, board string) ([]*Post, error)
+	DeletePost(ctx context.Context, no int, board string) (bool, error)
+	IsOp(ctx context.Context, no int, board string) (bool, error)
 }
