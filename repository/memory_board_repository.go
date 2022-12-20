@@ -1,11 +1,16 @@
 package repository
 
-import "github.com/1ort/goimbo/model"
+import (
+	"sync"
+
+	"github.com/1ort/goimbo/model"
+)
 
 type Board model.Board
 
 type MemoryBoardRepository struct {
 	Boards []*Board
+	mutex  sync.Mutex
 }
 
 func (self *MemoryBoardRepository) NewBoard(slug, name, descr string) (*Board, error) {
@@ -17,11 +22,15 @@ func (self *MemoryBoardRepository) NewBoard(slug, name, descr string) (*Board, e
 		Name:  name,
 		Descr: descr,
 	}
+	self.mutex.Lock()
+	defer self.mutex.Unlock()
 	self.Boards = append(self.Boards, b)
 	return b, nil
 }
 
 func (self *MemoryBoardRepository) GetBoard(slug string) (*Board, error) {
+	self.mutex.Lock()
+	defer self.mutex.Unlock()
 	for _, b := range self.Boards {
 		if b.Slug == slug {
 			return b, nil
@@ -31,6 +40,8 @@ func (self *MemoryBoardRepository) GetBoard(slug string) (*Board, error) {
 }
 
 func (self *MemoryBoardRepository) IsBoardExists(slug string) (bool, error) {
+	self.mutex.Lock()
+	defer self.mutex.Unlock()
 	for _, b := range self.Boards {
 		if b.Slug == slug {
 			return true, nil
@@ -40,5 +51,7 @@ func (self *MemoryBoardRepository) IsBoardExists(slug string) (bool, error) {
 }
 
 func (self *MemoryBoardRepository) GetBoardList() ([]*Board, error) {
+	self.mutex.Lock()
+	defer self.mutex.Unlock()
 	return self.Boards, nil
 }
