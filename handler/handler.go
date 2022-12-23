@@ -32,12 +32,14 @@ func SetWebHandler(cfg *HandlerConfig) {
 
 	web := cfg.R.Group(cfg.BaseUrl)
 	web.GET("/", h.main_page)
+
 	web_board := web.Group("/:board")
-	web_board.GET("/", h.board_page)
-	web_thread := web_board.Group("/:thread")
-	web_thread.GET("/", h.thread_page)
-	web_board.POST("/reply", h.reply)
+	web_board.GET("/", h.board_page) //TODO: redirect to board index page. Separate thread pages
 	web_board.POST("/newthread", h.newthread)
+
+	web_thread := web_board.Group("/thread/:thread")
+	web_thread.GET("/", h.thread_page)
+	web_thread.POST("/reply", h.reply)
 }
 
 func SetApiHandler(cfg *HandlerConfig) {
@@ -47,6 +49,7 @@ func SetApiHandler(cfg *HandlerConfig) {
 	api := cfg.R.Group(cfg.BaseUrl)
 	api.GET("/boards", h.get_boards)
 	api_board := api.Group("/:board")
+
 	api_board.GET("/threads", h.get_threads)
 	api_board.GET("/catalog", h.get_catalog)
 	api_board.GET("/archive", h.get_archive)
