@@ -25,11 +25,11 @@ func NewMemoryPostRepository(c *MemoryPostRepositoryConfig) model.PostRepository
 	}
 }
 
-func (self *memoryPostRepository) GetThreadList(ctx context.Context, board string) ([]*model.Post, error) {
-	self.mutex.Lock()
-	defer self.mutex.Unlock()
+func (mpr *memoryPostRepository) GetThreadList(ctx context.Context, board string) ([]*model.Post, error) {
+	mpr.mutex.Lock()
+	defer mpr.mutex.Unlock()
 	var posts []*model.Post
-	for _, p := range self.Posts[board] {
+	for _, p := range mpr.Posts[board] {
 		if p.Parent == 0 {
 			posts = append(posts, p)
 		}
@@ -37,9 +37,9 @@ func (self *memoryPostRepository) GetThreadList(ctx context.Context, board strin
 	return posts, nil
 }
 
-func (self *memoryPostRepository) NewPost(ctx context.Context, parent int, board, com string) (*model.Post, error) {
+func (mpr *memoryPostRepository) NewPost(ctx context.Context, parent int, board, com string) (*model.Post, error) {
 	if parent != 0 {
-		isop, err := self.IsOp(ctx, parent, board)
+		isop, err := mpr.IsOp(ctx, parent, board)
 		if err != nil {
 			return nil, err
 		}
@@ -47,23 +47,23 @@ func (self *memoryPostRepository) NewPost(ctx context.Context, parent int, board
 			return nil, model.NewBadRequest(fmt.Sprintf("post %v on board %v is not OP", parent, board))
 		}
 	}
-	self.mutex.Lock()
-	defer self.mutex.Unlock()
+	mpr.mutex.Lock()
+	defer mpr.mutex.Unlock()
 	p := &model.Post{
-		No:     len(self.Posts[board]) + 1,
+		No:     len(mpr.Posts[board]) + 1,
 		Parent: parent,
 		Board:  board,
 		Com:    com,
-		Time:   int(time.Now().Unix()),
+		Time:   time.Now().Unix(),
 	}
-	self.Posts[board] = append(self.Posts[board], p)
+	mpr.Posts[board] = append(mpr.Posts[board], p)
 	return p, nil
 }
 
-func (self *memoryPostRepository) GetPost(ctx context.Context, no int, board string) (*model.Post, error) {
-	self.mutex.Lock()
-	defer self.mutex.Unlock()
-	for _, p := range self.Posts[board] {
+func (mpr *memoryPostRepository) GetPost(ctx context.Context, no int, board string) (*model.Post, error) {
+	mpr.mutex.Lock()
+	defer mpr.mutex.Unlock()
+	for _, p := range mpr.Posts[board] {
 		if p.No == no {
 			return p, nil
 		}
@@ -71,8 +71,8 @@ func (self *memoryPostRepository) GetPost(ctx context.Context, no int, board str
 	return nil, model.NewNotFound("post", fmt.Sprintf("%d", no))
 }
 
-func (self *memoryPostRepository) GetThreadHistory(ctx context.Context, no int, board string) ([]*model.Post, error) {
-	isop, err := self.IsOp(ctx, no, board)
+func (mpr *memoryPostRepository) GetThreadHistory(ctx context.Context, no int, board string) ([]*model.Post, error) {
+	isop, err := mpr.IsOp(ctx, no, board)
 	if err != nil {
 		return nil, err
 	}
@@ -81,10 +81,10 @@ func (self *memoryPostRepository) GetThreadHistory(ctx context.Context, no int, 
 		return nil, model.NewBadRequest(fmt.Sprintf("post %v on board %v is not OP", no, board))
 	}
 
-	self.mutex.Lock()
-	defer self.mutex.Unlock()
+	mpr.mutex.Lock()
+	defer mpr.mutex.Unlock()
 	var posts []*model.Post
-	for _, p := range self.Posts[board] {
+	for _, p := range mpr.Posts[board] {
 		if p.No == no || p.Parent == no {
 			posts = append(posts, p)
 		}
@@ -92,10 +92,10 @@ func (self *memoryPostRepository) GetThreadHistory(ctx context.Context, no int, 
 	return posts, nil
 }
 
-func (self *memoryPostRepository) DeletePost(ctx context.Context, no int, board string) (bool, error) {
-	self.mutex.Lock()
-	defer self.mutex.Unlock()
-	for _, p := range self.Posts[board] {
+func (mpr *memoryPostRepository) DeletePost(ctx context.Context, no int, board string) (bool, error) {
+	mpr.mutex.Lock()
+	defer mpr.mutex.Unlock()
+	for _, p := range mpr.Posts[board] {
 		if p.No == no {
 			p.Com = "content deleted"
 			return true, nil
@@ -104,10 +104,10 @@ func (self *memoryPostRepository) DeletePost(ctx context.Context, no int, board 
 	return false, model.NewNotFound("post", fmt.Sprintf("%d", no))
 }
 
-func (self *memoryPostRepository) IsOp(ctx context.Context, no int, board string) (bool, error) {
-	self.mutex.Lock()
-	defer self.mutex.Unlock()
-	for _, p := range self.Posts[board] {
+func (mpr *memoryPostRepository) IsOp(ctx context.Context, no int, board string) (bool, error) {
+	mpr.mutex.Lock()
+	defer mpr.mutex.Unlock()
+	for _, p := range mpr.Posts[board] {
 		if p.No == no {
 			return p.Parent == 0, nil
 		}

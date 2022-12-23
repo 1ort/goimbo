@@ -23,22 +23,21 @@ func NewUserspaceService(c *UserspaceServiceConfig) model.Userspace {
 	}
 }
 
-func (self *UserspaceService) Boards(ctx context.Context) ([]*model.Board, error) {
-	return self.BoardRepository.GetBoardList(ctx)
-	//return nil, nil
+func (u *UserspaceService) GetBoards(ctx context.Context) ([]*model.Board, error) {
+	return u.BoardRepository.GetBoardList(ctx)
 }
-func (self *UserspaceService) Threads(ctx context.Context, board string) ([]*model.ThreadListPage, error) {
+func (u *UserspaceService) GetThread(ctx context.Context, board string, no int) (*model.Thread, error) {
 	return nil, nil
 }
-func (self *UserspaceService) Catalog(ctx context.Context, board string) ([]*model.CatalogPage, error) {
+func (u *UserspaceService) GetThreadPreview(ctx context.Context, board string, no int) (*model.ThreadPreview, error) {
 	return nil, nil
 }
-func (self *UserspaceService) Index(ctx context.Context, board string, page int) (*model.ThreadPage, error) {
+func (u *UserspaceService) GetBoardPage(ctx context.Context, board string, page int) (*model.BoardPage, error) {
 	return nil, nil
 }
-func (self *UserspaceService) Thread(ctx context.Context, board string, op int) ([]*model.Post, error) {
-	return nil, nil
+func (u *UserspaceService) NewThread(ctx context.Context, board, com string) error {
+	return nil
 }
-func (self *UserspaceService) NewPost(ctx context.Context, board string, parent int, com string) (*model.Post, error) {
-	return nil, nil
+func (u *UserspaceService) Reply(ctx context.Context, board, com string, parent int) error {
+	return nil
 }

@@ -16,15 +16,18 @@ type HandlerConfig struct {
 
 type WebHandler struct {
 	userspace model.Userspace
+	r         *gin.Engine
 }
 
 type ApiHandler struct {
 	userspace model.Userspace
+	r         *gin.Engine
 }
 
 func SetWebHandler(cfg *HandlerConfig) {
 	h := &WebHandler{
 		userspace: cfg.Userspace,
+		r:         cfg.R,
 	}
 
 	tmpl := template.Must(template.ParseFiles("./res/templates/dir.html"))
@@ -34,8 +37,9 @@ func SetWebHandler(cfg *HandlerConfig) {
 	web.GET("/", h.main_page)
 
 	web_board := web.Group("/:board")
-	web_board.GET("/", h.board_page) //TODO: redirect to board index page. Separate thread pages
 	web_board.POST("/newthread", h.newthread)
+	web_board.GET("/", h.redirect_to_zero_page) //TODO: redirect to /page/0/
+	web_board.GET("/page/:page", h.board_page)
 
 	web_thread := web_board.Group("/thread/:thread")
 	web_thread.GET("/", h.thread_page)
@@ -45,6 +49,7 @@ func SetWebHandler(cfg *HandlerConfig) {
 func SetApiHandler(cfg *HandlerConfig) {
 	h := &ApiHandler{
 		userspace: cfg.Userspace,
+		r:         cfg.R,
 	}
 	api := cfg.R.Group(cfg.BaseUrl)
 	api.GET("/boards", h.get_boards)

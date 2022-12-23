@@ -5,8 +5,6 @@ import (
 	"fmt"
 
 	"github.com/1ort/goimbo/handler"
-	"github.com/1ort/goimbo/model"
-	"github.com/1ort/goimbo/repository"
 	"github.com/1ort/goimbo/service"
 	"github.com/gin-gonic/gin"
 )
@@ -17,44 +15,23 @@ func main() {
 
 	config := ReadConfig(*confPtr)
 
-	init_boards := []*model.Board{
-		{
-			Slug:  "po",
-			Name:  "Politics",
-			Descr: "Политика",
-		},
-		{
-			Slug:  "b",
-			Name:  "bред",
-			Descr: "Бредач",
-		},
-		{
-			Slug:  "r",
-			Name:  "Random",
-			Descr: "Рандомач",
-		},
-		{
-			Slug:  "vg",
-			Name:  "Video games general",
-			Descr: "Майнкрафт и дота",
-		},
-	}
+	// boardRepo := repository.NewMemoryBoardRepository(
+	// 	&repository.MemoryBoardRepositoryConfig{
+	// 		Boards: init_boards,
+	// 	})
 
-	boardRepo := repository.NewMemoryBoardRepository(
-		&repository.MemoryBoardRepositoryConfig{
-			Boards: init_boards,
-		})
+	// postRepo := repository.NewMemoryPostRepository(
+	// 	&repository.MemoryPostRepositoryConfig{
+	// 		Posts: make(map[string][]*model.Post),
+	// 	})
 
-	postRepo := repository.NewMemoryPostRepository(
-		&repository.MemoryPostRepositoryConfig{
-			Posts: make(map[string][]*model.Post),
-		})
+	// userspace := service.NewUserspaceService(
+	// 	&service.UserspaceServiceConfig{
+	// 		PostRepository:  postRepo,
+	// 		BoardRepository: boardRepo,
+	// 	})
 
-	userspace := service.NewUserspaceService(
-		&service.UserspaceServiceConfig{
-			PostRepository:  postRepo,
-			BoardRepository: boardRepo,
-		})
+	userspace := service.NewMockUserspace()
 
 	if !config.Web.Enabled && !config.Api.Enabled {
 		fmt.Println("At least one: Web or API must be enabled. Enable in config")

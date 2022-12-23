@@ -28,13 +28,20 @@ type PostRepository interface {
 	IsOp(ctx context.Context, no int, board string) (bool, error)
 }
 
+type PostRepositoryRef interface {
+	NewPost(ctx context.Context, board, com string, parent int) error
+	//DeletePost(ctx context.Context, board, com string)
+	GetSingle(ctx context.Context, board string, no int) (*Post, error)
+	GetMultiple(ctx context.Context, board string, parent int, skip, limit int) ([]*Post, error)
+}
+
 type Userspace interface {
-	Boards(ctx context.Context) ([]*Board, error)
-	Threads(ctx context.Context, board string) ([]*ThreadListPage, error)
-	Catalog(ctx context.Context, board string) ([]*CatalogPage, error)
-	Index(ctx context.Context, board string, page int) (*ThreadPage, error)
-	Thread(ctx context.Context, board string, op int) ([]*Post, error)
-	NewPost(ctx context.Context, board string, parent int, com string) (*Post, error)
+	GetBoards(ctx context.Context) ([]*Board, error)
+	GetThread(ctx context.Context, board string, no int) (*Thread, error)
+	//GetThreadPreview(ctx context.Context, board string, no int) (*ThreadPreview, error)
+	GetBoardPage(ctx context.Context, board string, page int) (*BoardPage, error)
+	NewThread(ctx context.Context, board, com string) error
+	Reply(ctx context.Context, board, com string, parent int) error
 }
 
 type Adminspace interface {

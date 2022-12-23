@@ -11,7 +11,7 @@ import (
 
 func (h *ApiHandler) get_boards(c *gin.Context) {
 	ctx := c.Request.Context()
-	boardList, err := h.userspace.Boards(ctx)
+	boardList, err := h.userspace.GetBoards(ctx)
 	if err != nil {
 		c.JSON(model.Status(err), gin.H{
 			"status": model.Status(err),
@@ -28,7 +28,7 @@ func (h *ApiHandler) get_boards(c *gin.Context) {
 func (h *ApiHandler) get_threads(c *gin.Context) {
 	ctx := c.Request.Context()
 	board := c.Param("board")
-	threadList, err := h.userspace.Threads(ctx, board)
+	threadList, err := h.userspace.GetBoardPage(ctx, board, 0)
 	if err != nil {
 		c.JSON(model.Status(err), gin.H{
 			"status": model.Status(err),

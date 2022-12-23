@@ -24,8 +24,8 @@ func NewMemoryBoardRepository(c *MemoryBoardRepositoryConfig) model.BoardReposit
 	}
 }
 
-func (self *memoryBoardRepository) NewBoard(ctx context.Context, slug, name, descr string) (*model.Board, error) {
-	if ex, _ := self.IsBoardExists(ctx, slug); ex {
+func (mbr *memoryBoardRepository) NewBoard(ctx context.Context, slug, name, descr string) (*model.Board, error) {
+	if ex, _ := mbr.IsBoardExists(ctx, slug); ex {
 		return nil, model.NewConflict("board", slug)
 	}
 	b := &model.Board{
@@ -33,16 +33,16 @@ func (self *memoryBoardRepository) NewBoard(ctx context.Context, slug, name, des
 		Name:  name,
 		Descr: descr,
 	}
-	self.mutex.Lock()
-	defer self.mutex.Unlock()
-	self.Boards = append(self.Boards, b)
+	mbr.mutex.Lock()
+	defer mbr.mutex.Unlock()
+	mbr.Boards = append(mbr.Boards, b)
 	return b, nil
 }
 
-func (self *memoryBoardRepository) GetBoard(ctx context.Context, slug string) (*model.Board, error) {
-	self.mutex.Lock()
-	defer self.mutex.Unlock()
-	for _, b := range self.Boards {
+func (mbr *memoryBoardRepository) GetBoard(ctx context.Context, slug string) (*model.Board, error) {
+	mbr.mutex.Lock()
+	defer mbr.mutex.Unlock()
+	for _, b := range mbr.Boards {
 		if b.Slug == slug {
 			return b, nil
 		}
@@ -50,10 +50,10 @@ func (self *memoryBoardRepository) GetBoard(ctx context.Context, slug string) (*
 	return nil, model.NewNotFound("board", slug)
 }
 
-func (self *memoryBoardRepository) IsBoardExists(ctx context.Context, slug string) (bool, error) {
-	self.mutex.Lock()
-	defer self.mutex.Unlock()
-	for _, b := range self.Boards {
+func (mbr *memoryBoardRepository) IsBoardExists(ctx context.Context, slug string) (bool, error) {
+	mbr.mutex.Lock()
+	defer mbr.mutex.Unlock()
+	for _, b := range mbr.Boards {
 		if b.Slug == slug {
 			return true, nil
 		}
@@ -61,8 +61,8 @@ func (self *memoryBoardRepository) IsBoardExists(ctx context.Context, slug strin
 	return false, nil
 }
 
-func (self *memoryBoardRepository) GetBoardList(ctx context.Context) ([]*model.Board, error) {
-	self.mutex.Lock()
-	defer self.mutex.Unlock()
-	return self.Boards, nil
+func (mbr *memoryBoardRepository) GetBoardList(ctx context.Context) ([]*model.Board, error) {
+	mbr.mutex.Lock()
+	defer mbr.mutex.Unlock()
+	return mbr.Boards, nil
 }
