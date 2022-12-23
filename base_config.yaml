@@ -9,3 +9,5 @@ app:
   port: 3000 #webserver port
 api:
   base_url: /api
+web:
+  base_url: /

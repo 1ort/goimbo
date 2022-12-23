@@ -15,6 +15,9 @@ type Config struct {
 	Api struct {
 		BaseUrl string `yaml:"base_url"`
 	}
+	Web struct {
+		BaseUrl string `yaml:"base_url"`
+	}
 	Db struct {
 		Host string `yaml:"host"`
 		Port string `yaml:"port"`
@@ -51,4 +54,8 @@ func (cfg *Config) GetAppAddr() string {
 
 func (cfg *Config) GetBaseApiUrl() string {
 	return (cfg.Api.BaseUrl)
+}
+
+func (cfg *Config) GetBaseWebUrl() string {
+	return (cfg.Web.BaseUrl)
 }

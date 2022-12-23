@@ -58,9 +58,10 @@ func main() {
 
 	handler.NewHandler(
 		&handler.HandlerConfig{
-			R:         router,
-			BaseUrl:   config.GetBaseApiUrl(),
-			Userspace: userspace,
+			R:          router,
+			ApiBaseUrl: config.GetBaseApiUrl(),
+			WebBaseUrl: config.GetBaseWebUrl(),
+			Userspace:  userspace,
 		})
 
 	router.Run(config.GetAppAddr())
