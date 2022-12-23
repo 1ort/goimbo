@@ -30,31 +30,31 @@ func (self *memoryPostRepository) GetThreadList(ctx context.Context, board strin
 	defer self.mutex.Unlock()
 	var posts []*model.Post
 	for _, p := range self.Posts[board] {
-		if p.Resto == 0 {
+		if p.Parent == 0 {
 			posts = append(posts, p)
 		}
 	}
 	return posts, nil
 }
 
-func (self *memoryPostRepository) NewPost(ctx context.Context, resto int, board, com string) (*model.Post, error) {
-	if resto != 0 {
-		isop, err := self.IsOp(ctx, resto, board)
+func (self *memoryPostRepository) NewPost(ctx context.Context, parent int, board, com string) (*model.Post, error) {
+	if parent != 0 {
+		isop, err := self.IsOp(ctx, parent, board)
 		if err != nil {
 			return nil, err
 		}
 		if !isop {
-			return nil, model.NewBadRequest(fmt.Sprintf("post %v on board %v is not OP", resto, board))
+			return nil, model.NewBadRequest(fmt.Sprintf("post %v on board %v is not OP", parent, board))
 		}
 	}
 	self.mutex.Lock()
 	defer self.mutex.Unlock()
 	p := &model.Post{
-		No:    len(self.Posts[board]) + 1,
-		Resto: resto,
-		Board: board,
-		Com:   com,
-		Time:  int(time.Now().Unix()),
+		No:     len(self.Posts[board]) + 1,
+		Parent: parent,
+		Board:  board,
+		Com:    com,
+		Time:   int(time.Now().Unix()),
 	}
 	self.Posts[board] = append(self.Posts[board], p)
 	return p, nil
@@ -85,7 +85,7 @@ func (self *memoryPostRepository) GetThreadHistory(ctx context.Context, no int, 
 	defer self.mutex.Unlock()
 	var posts []*model.Post
 	for _, p := range self.Posts[board] {
-		if p.No == no || p.Resto == no {
+		if p.No == no || p.Parent == no {
 			posts = append(posts, p)
 		}
 	}
@@ -109,7 +109,7 @@ func (self *memoryPostRepository) IsOp(ctx context.Context, no int, board string
 	defer self.mutex.Unlock()
 	for _, p := range self.Posts[board] {
 		if p.No == no {
-			return p.Resto == 0, nil
+			return p.Parent == 0, nil
 		}
 	}
 	return false, model.NewNotFound("post", fmt.Sprintf("%d", no))

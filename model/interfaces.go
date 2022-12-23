@@ -20,7 +20,7 @@ type BoardRepository interface {
 }
 
 type PostRepository interface {
-	NewPost(ctx context.Context, resto int, board, com string) (*Post, error)
+	NewPost(ctx context.Context, parent int, board, com string) (*Post, error)
 	GetPost(ctx context.Context, no int, board string) (*Post, error)
 	GetThreadHistory(ctx context.Context, no int, board string) ([]*Post, error)
 	GetThreadList(ctx context.Context, board string) ([]*Post, error)
@@ -34,7 +34,7 @@ type Userspace interface {
 	Catalog(ctx context.Context, board string) ([]*CatalogPage, error)
 	Index(ctx context.Context, board string, page int) (*ThreadPage, error)
 	Thread(ctx context.Context, board string, op int) ([]*Post, error)
-	NewPost(ctx context.Context, board string, resto int, com string) (*Post, error)
+	NewPost(ctx context.Context, board string, parent int, com string) (*Post, error)
 }
 
 type Adminspace interface {

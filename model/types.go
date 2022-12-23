@@ -7,11 +7,11 @@ type Board struct {
 }
 
 type Post struct {
-	No    int    `db:"no" json:"no"`
-	Resto int    `db:"resto" json:"resto"`
-	Board string `db:"board" json:"board"`
-	Com   string `db:"com" json:"com"`
-	Time  int    `db:"time" json:"time"`
+	No     int    `db:"no" json:"no"`
+	Parent int    `db:"parent" json:"parent"`
+	Board  string `db:"board" json:"board"`
+	Com    string `db:"com" json:"com"`
+	Time   int    `db:"time" json:"time"`
 }
 
 type ThreadInfo struct {

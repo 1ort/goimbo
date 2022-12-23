@@ -39,6 +39,6 @@ func (self *UserspaceService) Index(ctx context.Context, board string, page int)
 func (self *UserspaceService) Thread(ctx context.Context, board string, op int) ([]*model.Post, error) {
 	return nil, nil
 }
-func (self *UserspaceService) NewPost(ctx context.Context, board string, resto int, com string) (*model.Post, error) {
+func (self *UserspaceService) NewPost(ctx context.Context, board string, parent int, com string) (*model.Post, error) {
 	return nil, nil
 }
