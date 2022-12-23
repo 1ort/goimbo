@@ -14,9 +14,11 @@ type Config struct {
 	}
 	Api struct {
 		BaseUrl string `yaml:"base_url"`
+		Enabled bool   `yaml:"enabled"`
 	}
 	Web struct {
 		BaseUrl string `yaml:"base_url"`
+		Enabled bool   `yaml:"enabled"`
 	}
 	Db struct {
 		Host string `yaml:"host"`

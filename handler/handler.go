@@ -7,38 +7,30 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Будет содержать всякие штуки типа коннектов к ДБ и хранилищ куки
-type Handler struct {
-	userspace model.Userspace
-	//postRepo  model.PostRepository
-}
-
 // Сюда будем передавать всё что нужно для инициализации хандлера
 type HandlerConfig struct {
-	R          *gin.Engine //router
-	ApiBaseUrl string
-	WebBaseUrl string
-	Userspace  model.Userspace
+	R         *gin.Engine //router
+	BaseUrl   string
+	Userspace model.Userspace
 }
 
-func NewHandler(cfg *HandlerConfig) {
-	h := &Handler{
+type WebHandler struct {
+	userspace model.Userspace
+}
+
+type ApiHandler struct {
+	userspace model.Userspace
+}
+
+func SetWebHandler(cfg *HandlerConfig) {
+	h := &WebHandler{
 		userspace: cfg.Userspace,
 	}
 
 	tmpl := template.Must(template.ParseFiles("./res/templates/dir.html"))
 	cfg.R.SetHTMLTemplate(tmpl)
 
-	api := cfg.R.Group(cfg.ApiBaseUrl)
-	api.GET("/boards", h.get_boards)
-	api_board := api.Group("/:board")
-	api_board.GET("/threads", h.get_threads)
-	api_board.GET("/catalog", h.get_catalog)
-	api_board.GET("/archive", h.get_archive)
-	api_board.GET("/:page", h.get_page)
-	api_board.GET("/thread/:op", h.get_thread)
-
-	web := cfg.R.Group(cfg.WebBaseUrl)
+	web := cfg.R.Group(cfg.BaseUrl)
 	web.GET("/", h.main_page)
 	web_board := web.Group("/:board")
 	web_board.GET("/", h.board_page)
@@ -46,4 +38,18 @@ func NewHandler(cfg *HandlerConfig) {
 	web_thread.GET("/", h.thread_page)
 	web_board.POST("/reply", h.reply)
 	web_board.POST("/newthread", h.newthread)
+}
+
+func SetApiHandler(cfg *HandlerConfig) {
+	h := &ApiHandler{
+		userspace: cfg.Userspace,
+	}
+	api := cfg.R.Group(cfg.BaseUrl)
+	api.GET("/boards", h.get_boards)
+	api_board := api.Group("/:board")
+	api_board.GET("/threads", h.get_threads)
+	api_board.GET("/catalog", h.get_catalog)
+	api_board.GET("/archive", h.get_archive)
+	api_board.GET("/:page", h.get_page)
+	api_board.GET("/thread/:op", h.get_thread)
 }

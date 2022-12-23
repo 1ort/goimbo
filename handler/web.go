@@ -18,7 +18,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (h *Handler) main_page(c *gin.Context) {
+func (h *WebHandler) main_page(c *gin.Context) {
 	boards, err := h.userspace.Boards(c.Request.Context())
 	if err != nil {
 		c.JSON(model.Status(err), gin.H{
@@ -32,18 +32,18 @@ func (h *Handler) main_page(c *gin.Context) {
 	})
 }
 
-func (h *Handler) board_page(c *gin.Context) {
+func (h *WebHandler) board_page(c *gin.Context) {
 
 }
 
-func (h *Handler) thread_page(c *gin.Context) {
+func (h *WebHandler) thread_page(c *gin.Context) {
 
 }
 
-func (h *Handler) reply(c *gin.Context) {
+func (h *WebHandler) reply(c *gin.Context) {
 
 }
 
-func (h *Handler) newthread(c *gin.Context) {
+func (h *WebHandler) newthread(c *gin.Context) {
 
 }
