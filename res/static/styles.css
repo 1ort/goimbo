@@ -1,0 +1,181 @@
+
+html, body, h1, h2, p, form, table, td, textarea, input, div {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: 100%;
+    font: inherit;
+    vertical-align: baseline;
+  }
+  
+  body {
+    font-family: monospace;
+    background-color: #fafafa;
+    color: #333;
+  }
+
+  footer {
+    text-align: center;
+  }
+  
+  h1, h2 {
+    font-weight: normal;
+    text-align: center;
+  }
+  
+  h1 {
+    font-size: 2em;
+    /* margin: 1em 0; */
+  }
+  
+  h2 {
+    font-size: 1.5em;
+    margin: 0.5em 0;
+  }
+  
+  p {
+    margin: 0.5em 0;
+    line-height: 1.5;
+  }
+  
+  /* Add some spacing and borders to the layout */
+  header, main, form, footer, .op_post_container, .last_replies_container {
+    margin: 1em;
+  }
+  
+  .op_post_container {
+    margin-bottom: 0em;
+    
+  }
+  
+  /* Style the post containers */
+  .post_container {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 1em;
+    margin-left: 3em;
+    padding: 1em;
+    display: table;
+  }
+
+  .thread_preview_metadata {
+    margin-left: 2em;
+    padding-left: 0em;
+  }
+
+  .op_post_container > .post_container {
+      border: 0px solid #ccc;
+      margin-bottom: 0em;
+      margin-left: 0em;
+    }
+
+  .post_container:not(.op_post_container > .post_container) {
+    background-color: #eee;
+  }
+  
+  .post_metadata {
+    font-size: 1em;
+    color: #999;
+    margin-bottom: 0.5em;
+  }
+  
+  .post_author {
+    font-weight: bold;
+  }
+  
+  .post_date {
+    margin-left: 0.5em;
+  }
+  
+  .post_number {
+    color: #999;
+    font-weight: bold;
+    font-size: 100%;
+    margin-left: 0.5em;
+  }
+
+  /* .op_post_container .post_number {
+    font-size: larger;
+  } */
+
+  .thread_preview_reply_link {
+    color: #999;
+    font-weight: bold;
+    font-size: larger;
+  }
+  
+  
+  .post_text {
+    margin: 0.5em 0;
+  }
+  
+  /* Style the form */
+  form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* align: center; */
+  }
+  
+  form table {
+    width: 50%;
+  }
+  
+  form td {
+    padding: 0.5em;
+  }
+  
+  form td.postblock {
+    width: 20%;
+    text-align: right;
+    font-weight: bold;
+  }
+  
+  form textarea {
+    width: 100%;
+    resize: none;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 0.5em;
+  }
+  
+  form input[type="submit"] {
+    margin-top: 0.5em;
+    border: none;
+    background-color: #333;
+    color: #fff;
+    padding: 0.5em 1em;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  form input[type="submit"]:hover {
+    background-color: #555;
+  }
+
+  .navbar {
+    text-align: center;
+    font-size: small;
+  }
+  
+  .navbar span{
+    color: #999;
+  }
+
+  .navbar a{
+    color: #999;
+    font-weight: bold;
+  }
+
+  .dir_boardlist{
+    margin-left: 1em;
+    text-align: left;
+    /* color: #999; */
+    /* font-weight: bold; */
+  }
+
+  .dir_boardlist a{
+    color: #555;
+    font-weight: bold;
+    font-size: larger;
+  }
