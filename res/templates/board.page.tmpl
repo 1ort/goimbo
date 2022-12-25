@@ -1,0 +1,34 @@
+{{define "board_title"}}
+    /{{.Board.Slug}}/ - {{.Board.Name}}
+{{end}}
+
+{{define "board_base"}}
+<!doctype html>
+<html lang='en'>
+    <head>
+        <meta charset='utf-8'>
+        <title>{{template "board_title" .}}</title>
+        <link rel="stylesheet" href="/styles.css">
+    </head>
+    <body>
+        <header>
+            <h1>{{.Board.Name}}</h1>
+            <h2>{{.Board.Descr}}</h2>
+        </header>
+        <main>
+            <hr>
+            {{template "threadform" .}}
+            {{template "navbar" .}}
+            {{range .Threads}}
+            <hr>
+                {{template "thread_preview" .}} 
+            {{end}}
+            <hr>
+            {{template "board_navbar" .}}
+        </main>
+        {{template "footer" .}}
+    </body>
+</html>
+{{end}}
+
+{{template "board_base" .}}

@@ -29,7 +29,12 @@ type ThreadPreview struct {
 	LastModified   time.Time `json:"last_modified"`
 }
 
+type PageValue struct {
+	CurrentPage int `json:"current"`
+	TotalPages  int `json:"total"`
+}
+
 type BoardPage struct {
-	Page    int              `json:"page"`
+	Page    *PageValue       `json:"page"`
 	Threads []*ThreadPreview `json:"threads"`
 }

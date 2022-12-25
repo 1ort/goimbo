@@ -1,0 +1,22 @@
+{{define "thread_preview"}}
+<div class="thread_preview_container">
+    {{with .OP}}
+    <div class="op_post_container">
+        {{template "post" .}}
+    </div>
+    {{end}}
+    <div class="thread_preview_metadata">
+        {{if ne .OmittedReplies 0}}
+        <span class="thread_preview_replies_ommited">{{.OmittedReplies}} posts omitted.</span>
+        {{end}}
+        {{with .OP}}
+        <a class="thread_preview_reply_link" href="/{{.Board}}/thread/{{.No}}">Reply</a>
+        {{end}}
+    </div>
+    <div class="last_replies_container">
+        {{range .LastReplies}}
+            {{template "post" .}}
+        {{end}}
+    </div>
+</div>
+{{end}}

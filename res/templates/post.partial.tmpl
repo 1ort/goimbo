@@ -1,0 +1,16 @@
+{{define "post"}}
+<div class="post_container"> 
+    <div class="post_metadata">
+        <span class="post_author">Anonymous</span>
+        <span class="post_date">{{.Time.Format "2/1/2006 Mon 15:04:05"}}</span>
+        {{if eq .Parent 0}}
+        <a class="post_number" href="/{{.Board}}/thread/{{.No}}">#{{.No}}</a>
+        {{else}}
+        <a class="post_number" name="{{.No}}" href="/{{.Board}}/thread/{{.Parent}}#{{.No}}">#{{.No}}</a>
+        {{end}}
+    </div>
+    <div class="post_content">
+        <blockquote class="post_text">{{.Com}}</blockquote>
+    </div>
+</div>
+{{end}}

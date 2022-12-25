@@ -1,0 +1,37 @@
+{{define "thread_title"}}
+    /{{.board_data.Slug}}/ - {{.thread_data.OP.No}}
+{{end}}
+
+{{define "thread_base"}}
+<!doctype html>
+<html lang='en'>
+    <head>
+        <meta charset='utf-8'>
+        <title>{{template "thread_title" .}}</title>
+        <link rel="stylesheet" href="/styles.css">
+    </head>
+    <body>
+        <header>
+            <h1>{{.board_data.Name}}</h1>
+            <h2>{{.board_data.Descr}}</h2>
+        </header>
+        <main>
+            <hr>
+            {{with .OP}}
+                {{template "replyform" .}}
+                <hr>
+                <div class="op_post_container">
+                    {{template "post" .}}
+                </div>
+            {{end}}
+            {{range .Replies}}
+                {{template "post" .}}
+            {{end}}
+            <hr>
+        </main>
+        {{template "footer" .}}
+    </body>
+</html>
+{{end}}
+
+{{template "thread_base" .}}

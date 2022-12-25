@@ -1,0 +1,38 @@
+{{define "replytable"}}
+    <table>
+        <tbody>
+            <tr>
+                <td class="postblock">
+                    Comment
+                </td>
+                <td>
+                    <textarea 
+                        name="text" 
+                        placeholder="Comment" 
+                        rows="4" cols="48" 
+                        minlength="5" 
+                        maxlength="1500" 
+                        required=""></textarea>
+                </td>
+            </tr>
+            <tr>
+                <td></td>
+                <td> <input type="submit" value="Post"></td>
+            </tr>
+        </tbody>
+    </table>
+{{end}}
+
+{{/* Use top-level */}}
+{{define "threadform"}}
+<form id="threadform" action="/{{.Board.Slug}}/newthread" method="POST" enctype="multipart/form-data">
+    {{template "replytable"}}
+</form>
+{{end}}
+
+{{/* Use with OP-post */}}
+{{define "replyform"}}
+<form id="postform" action="/{{.Board}}/{{.No}}/reply" method="POST" enctype="multipart/form-data">
+    {{template "replytable"}}
+</form>
+{{end}}

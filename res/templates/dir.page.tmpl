@@ -1,0 +1,31 @@
+{{define "dir_title"}}
+    Goimbo
+{{end}}
+
+{{define "dir_base"}}
+<!doctype html>
+<html lang='en'>
+    <head>
+        <meta charset='utf-8'>
+        <title>{{template "dir_title" .}}</title>
+        <link rel="stylesheet" href="/styles.css">
+    </head>
+    <body>
+        <header>
+            <h2>Board list</h2>
+        </header>
+        <main>
+            <hr>
+            {{range .Boards}}
+            <li class="dir_boardlist">
+                <a class="boardlink" href="/{{.Slug}}/" title="{{.Descr}}">/{{.Slug}}/ {{.Name}}</a>
+            </li>
+            {{end}}
+            <hr>
+        </main>
+        {{template "footer" .}}
+    </body>
+</html>
+{{end}}
+
+{{template "dir_base" .}}

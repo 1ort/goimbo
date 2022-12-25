@@ -30,8 +30,25 @@ func SetWebHandler(cfg *HandlerConfig) {
 		r:         cfg.R,
 	}
 
-	tmpl := template.Must(template.ParseFiles("./res/templates/dir.html"))
+	funcmap := template.FuncMap{
+		"intRange": IntRange,
+	}
+
+	tmpl := template.Must(
+		template.New("").Funcs(funcmap).ParseFiles(
+			"res/templates/post.partial.tmpl",
+			"res/templates/postform.partial.tmpl",
+			"res/templates/thread_preview.partial.tmpl",
+			"res/templates/footer.partial.tmpl",
+			"res/templates/navbar.partial.tmpl",
+			"res/templates/board.page.tmpl",
+			"res/templates/thread.page.tmpl",
+			"res/templates/dir.page.tmpl",
+			//"./res/templates/board_page.html",
+		))
 	cfg.R.SetHTMLTemplate(tmpl)
+	cfg.R.StaticFile("/styles.css", "./res/static/styles.css")
+	cfg.R.StaticFile("/favicon.ico", "./res/static/favicon.ico")
 
 	web := cfg.R.Group(cfg.BaseUrl)
 	web.GET("/", h.main_page)

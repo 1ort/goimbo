@@ -1,0 +1,13 @@
+{{define "board_navbar"}}
+{{$slug := .Board.Slug}}
+{{$current := .Page.CurrentPage}}
+<div class="navbar">
+<div class="page_list">
+    [
+    {{range $i, $p := intRange .Page.TotalPages}}
+        {{if $i}}/ {{end}}{{if ne $p $current}}<a href="/{{$slug}}/page/{{$p}}">{{$p}}</a>{{else}}<span>{{$p}}</span>{{end}}
+    {{end}}
+    ]
+</div>
+</div>
+{{end}}

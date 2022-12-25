@@ -33,10 +33,12 @@ type PostRepositoryRef interface {
 	//DeletePost(ctx context.Context, board, com string)
 	GetSingle(ctx context.Context, board string, no int) (*Post, error)
 	GetMultiple(ctx context.Context, board string, parent int, skip, limit int) ([]*Post, error)
+	Count(ctx context.Context, board string, parent int) (int, error)
 }
 
 type Userspace interface {
 	GetBoards(ctx context.Context) ([]*Board, error)
+	GetBoard(ctx context.Context, slug string) (*Board, error)
 	GetThread(ctx context.Context, board string, no int) (*Thread, error)
 	//GetThreadPreview(ctx context.Context, board string, no int) (*ThreadPreview, error)
 	GetBoardPage(ctx context.Context, board string, page int) (*BoardPage, error)

@@ -23,6 +23,9 @@ func NewUserspaceService(c *UserspaceServiceConfig) model.Userspace {
 	}
 }
 
+func (u *UserspaceService) GetBoard(ctx context.Context, slug string) (*model.Board, error) {
+	return nil, nil
+}
 func (u *UserspaceService) GetBoards(ctx context.Context) ([]*model.Board, error) {
 	return u.BoardRepository.GetBoardList(ctx)
 }
