@@ -32,8 +32,16 @@ func (u *UserspaceServiceMock) GetBoards(ctx context.Context) ([]*model.Board, e
 		{Slug: "b", Name: "Board B", Descr: "Board B"},
 		{Slug: "a", Name: "Board A", Descr: "Board A"},
 		{Slug: "c", Name: "Board C", Descr: "Board C"},
+		{Slug: "b", Name: "Board B", Descr: "Board B description"},
+		{Slug: "a", Name: "Board A", Descr: "Board A description"},
+		{Slug: "c", Name: "Board C", Descr: "Board C description"},
 	}, nil
+}
 
+func (u *UserspaceServiceMock) GetBoard(ctx context.Context, slug string) (*model.Board, error) {
+	return &model.Board{
+		Slug: "b", Name: "Board B", Descr: "Board B description",
+	}, nil
 }
 
 func (u *UserspaceServiceMock) GetThread(ctx context.Context, board string, no int) (*model.Thread, error) {
@@ -44,7 +52,7 @@ func (u *UserspaceServiceMock) GetThread(ctx context.Context, board string, no i
 			Parent: 0,
 			Board:  board,
 			Com:    fmt.Sprintf("Post %d", i),
-			Time:   time.Now().Unix(),
+			Time:   time.Now(),
 		}
 	}
 	return &model.Thread{
@@ -60,7 +68,7 @@ func (u *UserspaceServiceMock) GetThreadPreview(ctx context.Context, board strin
 			Parent: 0,
 			Board:  board,
 			Com:    fmt.Sprintf("Post %d", i),
-			Time:   time.Now().Unix(),
+			Time:   time.Now(),
 		}
 	}
 	return &model.ThreadPreview{
@@ -68,7 +76,7 @@ func (u *UserspaceServiceMock) GetThreadPreview(ctx context.Context, board strin
 		Replies:        10,
 		OmittedReplies: 7,
 		LastReplies:    posts[3:],
-		LastModified:   time.Now().Unix(),
+		LastModified:   time.Now(),
 	}, nil
 }
 func (u *UserspaceServiceMock) GetBoardPage(ctx context.Context, board string, page int) (*model.BoardPage, error) {
@@ -89,7 +97,7 @@ func (u *UserspaceServiceMock) GetBoardPage(ctx context.Context, board string, p
 			Replies:        10,
 			OmittedReplies: 7,
 			LastReplies:    posts[7:],
-			LastModified:   time.Now().Unix(),
+			LastModified:   time.Now(),
 		}
 	}
 	return &model.BoardPage{

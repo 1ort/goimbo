@@ -54,7 +54,7 @@ func (mpr *memoryPostRepository) NewPost(ctx context.Context, parent int, board,
 		Parent: parent,
 		Board:  board,
 		Com:    com,
-		Time:   time.Now().Unix(),
+		Time:   time.Now(),
 	}
 	mpr.Posts[board] = append(mpr.Posts[board], p)
 	return p, nil
