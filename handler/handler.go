@@ -44,7 +44,6 @@ func SetWebHandler(cfg *HandlerConfig) {
 			"res/templates/board.page.tmpl",
 			"res/templates/thread.page.tmpl",
 			"res/templates/dir.page.tmpl",
-			//"./res/templates/board_page.html",
 		))
 	cfg.R.SetHTMLTemplate(tmpl)
 	cfg.R.StaticFile("/styles.css", "./res/static/styles.css")
