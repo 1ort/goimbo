@@ -1,12 +1,16 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 
 	"github.com/1ort/goimbo/handler"
+	"github.com/1ort/goimbo/model"
+	"github.com/1ort/goimbo/repository"
 	"github.com/1ort/goimbo/service"
 	"github.com/gin-gonic/gin"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 func main() {
@@ -15,23 +19,29 @@ func main() {
 
 	config := ReadConfig(*confPtr)
 
-	// boardRepo := repository.NewMemoryBoardRepository(
-	// 	&repository.MemoryBoardRepositoryConfig{
-	// 		Boards: init_boards,
-	// 	})
+	pgpool, err := pgxpool.New(context.Background(), config.GetDataBaseUrl())
+	if err != nil {
+		panic(err)
+	}
 
-	// postRepo := repository.NewMemoryPostRepository(
-	// 	&repository.MemoryPostRepositoryConfig{
-	// 		Posts: make(map[string][]*model.Post),
-	// 	})
+	boardrepo := repository.NewMemoryBoardRepository(
+		&repository.MemoryBoardRepositoryConfig{
+			Boards: []*model.Board{
+				{Slug: "b", Name: "Board B", Descr: "Board B description"},
+				{Slug: "a", Name: "Board A", Descr: "Board A description"},
+				{Slug: "c", Name: "Board C", Descr: "Board C description"},
+			},
+		})
+	postrepo := repository.NewPGPostRepository(
+		&repository.PgPostRepoConfig{
+			Pool: pgpool,
+		})
 
-	// userspace := service.NewUserspaceService(
-	// 	&service.UserspaceServiceConfig{
-	// 		PostRepository:  postRepo,
-	// 		BoardRepository: boardRepo,
-	// 	})
-
-	userspace := service.NewMockUserspace()
+	userspace := service.NewUserspaceService(
+		&service.UserspaceServiceConfig{
+			BoardRepository: boardrepo,
+			PostRepository:  postrepo,
+		})
 
 	if !config.Web.Enabled && !config.Api.Enabled {
 		fmt.Println("At least one: Web or API must be enabled. Enable in config")
@@ -54,6 +64,5 @@ func main() {
 				Userspace: userspace,
 			})
 	}
-
 	router.Run(config.GetAppAddr())
 }

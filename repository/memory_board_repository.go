@@ -25,7 +25,7 @@ func NewMemoryBoardRepository(c *MemoryBoardRepositoryConfig) model.BoardReposit
 }
 
 func (mbr *memoryBoardRepository) NewBoard(ctx context.Context, slug, name, descr string) (*model.Board, error) {
-	if ex, _ := mbr.IsBoardExists(ctx, slug); ex {
+	if ok, _ := mbr.GetBoard(ctx, slug); ok != nil {
 		return nil, model.NewConflict("board", slug)
 	}
 	b := &model.Board{
@@ -48,17 +48,6 @@ func (mbr *memoryBoardRepository) GetBoard(ctx context.Context, slug string) (*m
 		}
 	}
 	return nil, model.NewNotFound("board", slug)
-}
-
-func (mbr *memoryBoardRepository) IsBoardExists(ctx context.Context, slug string) (bool, error) {
-	mbr.mutex.Lock()
-	defer mbr.mutex.Unlock()
-	for _, b := range mbr.Boards {
-		if b.Slug == slug {
-			return true, nil
-		}
-	}
-	return false, nil
 }
 
 func (mbr *memoryBoardRepository) GetBoardList(ctx context.Context) ([]*model.Board, error) {

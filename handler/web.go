@@ -98,6 +98,7 @@ func (h *WebHandler) thread_page(c *gin.Context) {
 	}
 	thread_data, err := h.userspace.GetThread(c.Request.Context(), board, thread_n)
 	if err != nil {
+		fmt.Printf("%v \n", err)
 		err := model.NewNotFound("page", thread)
 		c.JSON(model.Status(err), gin.H{
 			"status": model.Status(err),
@@ -138,17 +139,8 @@ func (h *WebHandler) reply(c *gin.Context) {
 
 func (h *WebHandler) newthread(c *gin.Context) {
 	board := c.Param("board")
-	// thread := c.Param("thread")
-	// thread_n, err := strconv.Atoi(thread)
-	// if err != nil {
-	// 	err := model.NewNotFound("page", thread)
-	// 	c.JSON(model.Status(err), gin.H{
-	// 		"status": model.Status(err),
-	// 		"result": err,
-	// 	})
-	// 	return
-	// }
 	com := c.PostForm("text")
+	fmt.Printf("Newthread: %s", com)
 	newPost, err := h.userspace.NewThread(c.Request.Context(), board, com)
 	if err != nil {
 		c.JSON(model.Status(err), gin.H{

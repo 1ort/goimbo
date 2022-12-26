@@ -31,7 +31,8 @@ func SetWebHandler(cfg *HandlerConfig) {
 	}
 
 	funcmap := template.FuncMap{
-		"intRange": IntRange,
+		"intRange":   IntRange,
+		"formatBody": FormatBody,
 	}
 
 	tmpl := template.Must(
