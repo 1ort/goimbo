@@ -5,11 +5,11 @@ db:
   pass:
   name:
 app:
-  host: localhost #hostname
-  port: 3000 #webserver port
+  host: localhost 
+  port: 3000
 api:
   base_url: /api
-  enabled: true
+  enabled: false
 web:
   base_url: /
   enabled: true
