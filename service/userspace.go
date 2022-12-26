@@ -38,9 +38,9 @@ func (u *UserspaceService) GetThreadPreview(ctx context.Context, board string, n
 func (u *UserspaceService) GetBoardPage(ctx context.Context, board string, page int) (*model.BoardPage, error) {
 	return nil, nil
 }
-func (u *UserspaceService) NewThread(ctx context.Context, board, com string) error {
-	return nil
+func (u *UserspaceService) NewThread(ctx context.Context, board, com string) (*model.Post, error) {
+	return nil, nil
 }
-func (u *UserspaceService) Reply(ctx context.Context, board, com string, parent int) error {
-	return nil
+func (u *UserspaceService) Reply(ctx context.Context, board, com string, parent int) (*model.Post, error) {
+	return nil, nil
 }

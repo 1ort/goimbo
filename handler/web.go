@@ -113,11 +113,49 @@ func (h *WebHandler) thread_page(c *gin.Context) {
 }
 
 func (h *WebHandler) reply(c *gin.Context) {
-
+	board := c.Param("board")
+	thread := c.Param("thread")
+	thread_n, err := strconv.Atoi(thread)
+	if err != nil {
+		err := model.NewNotFound("page", thread)
+		c.JSON(model.Status(err), gin.H{
+			"status": model.Status(err),
+			"result": err,
+		})
+		return
+	}
+	com := c.PostForm("text")
+	newPost, err := h.userspace.Reply(c.Request.Context(), board, com, thread_n)
+	if err != nil {
+		c.JSON(model.Status(err), gin.H{
+			"status": model.Status(err),
+			"result": err,
+		})
+		return
+	}
+	c.Redirect(http.StatusFound, fmt.Sprintf("/%s/thread/%v#%v", board, thread_n, newPost.No))
 }
 
 func (h *WebHandler) newthread(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
-		"res": "newthread",
-	})
+	board := c.Param("board")
+	// thread := c.Param("thread")
+	// thread_n, err := strconv.Atoi(thread)
+	// if err != nil {
+	// 	err := model.NewNotFound("page", thread)
+	// 	c.JSON(model.Status(err), gin.H{
+	// 		"status": model.Status(err),
+	// 		"result": err,
+	// 	})
+	// 	return
+	// }
+	com := c.PostForm("text")
+	newPost, err := h.userspace.NewThread(c.Request.Context(), board, com)
+	if err != nil {
+		c.JSON(model.Status(err), gin.H{
+			"status": model.Status(err),
+			"result": err,
+		})
+		return
+	}
+	c.Redirect(http.StatusFound, fmt.Sprintf("/%s/thread/%v", board, newPost.No))
 }

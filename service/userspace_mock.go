@@ -107,9 +107,21 @@ func (u *UserspaceServiceMock) GetBoardPage(ctx context.Context, board string, p
 	}, nil
 }
 
-func (u *UserspaceServiceMock) NewThread(ctx context.Context, board, com string) error {
-	return nil
+func (u *UserspaceServiceMock) NewThread(ctx context.Context, board, com string) (*model.Post, error) {
+	return &model.Post{
+		No:     5,
+		Parent: 0,
+		Board:  board,
+		Com:    fmt.Sprintf("Post 5 Lorem ipsum dolor sit amet."),
+		Time:   time.Now(),
+	}, nil
 }
-func (u *UserspaceServiceMock) Reply(ctx context.Context, board, com string, parent int) error {
-	return nil
+func (u *UserspaceServiceMock) Reply(ctx context.Context, board, com string, parent int) (*model.Post, error) {
+	return &model.Post{
+		No:     10,
+		Parent: parent,
+		Board:  board,
+		Com:    fmt.Sprintf("Post 5 Lorem ipsum dolor sit amet."),
+		Time:   time.Now(),
+	}, nil
 }

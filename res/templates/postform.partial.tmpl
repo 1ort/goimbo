@@ -10,7 +10,7 @@
                         name="text" 
                         placeholder="Comment" 
                         rows="4" cols="48" 
-                        minlength="5" 
+                        minlength="3" 
                         maxlength="1500" 
                         required=""></textarea>
                 </td>
@@ -32,7 +32,7 @@
 
 {{/* Use with OP-post */}}
 {{define "replyform"}}
-<form id="postform" action="/{{.Board}}/{{.No}}/reply" method="POST" enctype="multipart/form-data">
+<form id="postform" action="/{{.Board}}/thread/{{.No}}/reply" method="POST" enctype="multipart/form-data">
     {{template "replytable"}}
 </form>
 {{end}}

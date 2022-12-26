@@ -42,8 +42,8 @@ type Userspace interface {
 	GetThread(ctx context.Context, board string, no int) (*Thread, error)
 	//GetThreadPreview(ctx context.Context, board string, no int) (*ThreadPreview, error)
 	GetBoardPage(ctx context.Context, board string, page int) (*BoardPage, error)
-	NewThread(ctx context.Context, board, com string) error
-	Reply(ctx context.Context, board, com string, parent int) error
+	NewThread(ctx context.Context, board, com string) (*Post, error)
+	Reply(ctx context.Context, board, com string, parent int) (*Post, error)
 }
 
 type Adminspace interface {
