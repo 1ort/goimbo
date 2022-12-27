@@ -40,3 +40,6 @@ go build .
 - Tripcodes
 - password-based file/post deletion
 - Anti-spam/anti-flood
+- Docker & docker-compose
+- Dashboard
+- Feedback form
