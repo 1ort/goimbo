@@ -74,7 +74,7 @@ func (p *PgPostRepository) GetSingle(ctx context.Context, board string, no int) 
 	return &post, nil
 }
 
-/*reverse = от новых к старым*/
+/*reverse = from newer to older posts*/
 func (p *PgPostRepository) GetMultiple(ctx context.Context, board string, parent int, skip, limit int, reverse, sortByLastModified bool) ([]*model.Post, error) {
 	if limit == 0 {
 		limit = 100_000
