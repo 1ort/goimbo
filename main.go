@@ -64,5 +64,5 @@ func main() {
 				Userspace: userspace,
 			})
 	}
-	router.Run(config.GetAppAddr())
+	router.Run(config.GetAppAddr()) //nolint
 }
