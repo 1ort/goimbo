@@ -31,15 +31,15 @@ go build .
 
 # To-Do
 
-- Read-only API
-- Post API using tokens
-- CSRF protection
-- Captcha
-- Admin functionality
-- Upload images and files
-- Tripcodes
-- password-based file/post deletion
-- Anti-spam/anti-flood
-- Docker & docker-compose
-- Dashboard
-- Feedback form
+- [x] Read-only API
+- [ ] Post API using tokens
+- [ ] CSRF protection
+- [ ] Captcha
+- [ ] Admin functionality
+- [ ] Upload images and files
+- [ ] Tripcodes
+- [ ] password-based file/post deletion
+- [ ] Anti-spam/anti-flood
+- [ ] Docker & docker-compose
+- [ ] Dashboard
+- [ ] Feedback form
