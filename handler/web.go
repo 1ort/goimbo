@@ -89,7 +89,7 @@ func (h *WebHandler) threadPage(c *gin.Context) {
 	}
 	thread, err := strconv.Atoi(rawThread)
 	if err != nil {
-		err := model.NewNotFound("page", rawThread)
+		err := model.NewNotFound("thread", rawThread)
 		c.JSON(model.Status(err), gin.H{
 			"status": model.Status(err),
 			"result": err,
