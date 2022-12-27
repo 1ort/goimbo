@@ -10,8 +10,7 @@ import (
 )
 
 func (h *APIHandler) getBoards(c *gin.Context) {
-	ctx := c.Request.Context()
-	boardList, err := h.userspace.GetBoards(ctx)
+	boardList, err := h.userspace.GetBoards(c.Request.Context())
 	if err != nil {
 		c.JSON(model.Status(err), gin.H{
 			"status": model.Status(err),
@@ -25,10 +24,9 @@ func (h *APIHandler) getBoards(c *gin.Context) {
 	})
 }
 
-func (h *APIHandler) getThreads(c *gin.Context) {
-	ctx := c.Request.Context()
+func (h *APIHandler) getBoard(c *gin.Context) {
 	board := c.Param("board")
-	threadList, err := h.userspace.GetBoardPage(ctx, board, 0)
+	boardData, err := h.userspace.GetBoard(c.Request.Context(), board)
 	if err != nil {
 		c.JSON(model.Status(err), gin.H{
 			"status": model.Status(err),
@@ -38,56 +36,72 @@ func (h *APIHandler) getThreads(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"status": http.StatusOK,
-		"result": threadList,
-	})
-
-}
-
-func (h *APIHandler) getCatalog(c *gin.Context) {
-	board := c.Param("board")
-	c.JSON(http.StatusOK, gin.H{
-		"status": http.StatusOK,
-		"result": fmt.Sprintf("Catalog of %s board here", board),
-	})
-
-}
-
-func (h *APIHandler) getArchive(c *gin.Context) {
-	board := c.Param("board")
-	c.JSON(http.StatusOK, gin.H{
-		"status": http.StatusOK,
-		"result": fmt.Sprintf("Archive of %s board here", board),
+		"result": boardData,
 	})
 }
 
 func (h *APIHandler) getPage(c *gin.Context) {
 	board := c.Param("board")
-	page := c.Param("page")
-	if _, err := strconv.Atoi(page); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"status": http.StatusBadRequest,
-			"result": fmt.Sprintf("Page number must be an integer, got %s instead", page),
+	rawPage := c.Param("page")
+	page, err := strconv.Atoi(rawPage)
+	if err != nil {
+		err := model.NewNotFound("page", rawPage)
+		c.JSON(model.Status(err), gin.H{
+			"status": model.Status(err),
+			"result": err,
 		})
-	} else {
+		return
+	}
+	_, err = h.userspace.GetBoard(c.Request.Context(), board) //404 if board does not exist
+	if err != nil {
+		c.JSON(model.Status(err), gin.H{
+			"status": model.Status(err),
+			"result": err,
+		})
+		return
+	}
+	pageData, err := h.userspace.GetBoardPage(c.Request.Context(), board, page)
+	if err != nil {
+		c.JSON(model.Status(err), gin.H{
+			"status": model.Status(err),
+			"result": err,
+		})
+		return
+	}
+	{
 		c.JSON(http.StatusOK, gin.H{
 			"status": http.StatusOK,
-			"result": fmt.Sprintf("Page number %s on %s board here", page, board),
+			"result": pageData,
 		})
 	}
 }
 
 func (h *APIHandler) getThread(c *gin.Context) {
 	board := c.Param("board")
-	op := c.Param("op")
-	if _, err := strconv.Atoi(op); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"status": http.StatusBadRequest,
-			"result": fmt.Sprintf("Thread number must be an integer, got %s instead", op),
+	rawThread := c.Param("op")
+	thread, err := strconv.Atoi(rawThread)
+	if err != nil {
+		err := model.NewNotFound("thread", rawThread)
+		c.JSON(model.Status(err), gin.H{
+			"status": model.Status(err),
+			"result": err,
 		})
-	} else {
+		return
+	}
+	threadData, err := h.userspace.GetThread(c.Request.Context(), board, thread)
+	if err != nil {
+		fmt.Printf("%v \n", err)
+		err := model.NewNotFound("page", rawThread)
+		c.JSON(model.Status(err), gin.H{
+			"status": model.Status(err),
+			"result": err,
+		})
+		return
+	}
+	{
 		c.JSON(http.StatusOK, gin.H{
 			"status": http.StatusOK,
-			"result": fmt.Sprintf("Thread number %s content on %s board here", op, board),
+			"result": threadData,
 		})
 	}
 }

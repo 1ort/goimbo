@@ -55,7 +55,7 @@ func SetWebHandler(cfg *Config) {
 
 	webBoard := web.Group("/:board")
 	webBoard.POST("/newthread", h.newthread)
-	webBoard.GET("/", h.redirectToZeroPage) //TODO: redirect to /page/0/
+	webBoard.GET("/", h.redirectToZeroPage) //redirects to /page/0/
 	webBoard.GET("/page/:page", h.boardPage)
 
 	webThread := webBoard.Group("/thread/:thread")
@@ -70,11 +70,9 @@ func SetAPIHandler(cfg *Config) {
 	}
 	api := cfg.R.Group(cfg.BaseURL)
 	api.GET("/boards", h.getBoards)
-	apiBoard := api.Group("/:board")
 
-	apiBoard.GET("/threads", h.getThreads)
-	apiBoard.GET("/catalog", h.getCatalog)
-	apiBoard.GET("/archive", h.getArchive)
+	apiBoard := api.Group("/:board")
+	apiBoard.GET("/", h.getBoard)
 	apiBoard.GET("/:page", h.getPage)
 	apiBoard.GET("/thread/:op", h.getThread)
 }
