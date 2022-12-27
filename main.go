@@ -48,19 +48,19 @@ func main() {
 		return
 	}
 	router := gin.Default()
-	if config.Web.Enabled {
-		handler.SetWebHandler(
-			&handler.Config{
-				R:         router,
-				BaseURL:   config.Web.BaseURL,
-				Userspace: userspace,
-			})
-	}
 	if config.API.Enabled {
 		handler.SetAPIHandler(
 			&handler.Config{
 				R:         router,
 				BaseURL:   config.API.BaseURL,
+				Userspace: userspace,
+			})
+	}
+	if config.Web.Enabled {
+		handler.SetWebHandler(
+			&handler.Config{
+				R:         router,
+				BaseURL:   config.Web.BaseURL,
 				Userspace: userspace,
 			})
 	}
