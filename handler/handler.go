@@ -8,9 +8,9 @@ import (
 )
 
 // Сюда будем передавать всё что нужно для инициализации хандлера
-type HandlerConfig struct {
+type Config struct {
 	R         *gin.Engine //router
-	BaseUrl   string
+	BaseURL   string
 	Userspace model.Userspace
 }
 
@@ -19,12 +19,12 @@ type WebHandler struct {
 	r         *gin.Engine
 }
 
-type ApiHandler struct {
+type APIHandler struct {
 	userspace model.Userspace
 	r         *gin.Engine
 }
 
-func SetWebHandler(cfg *HandlerConfig) {
+func SetWebHandler(cfg *Config) {
 	h := &WebHandler{
 		userspace: cfg.Userspace,
 		r:         cfg.R,
@@ -50,31 +50,31 @@ func SetWebHandler(cfg *HandlerConfig) {
 	cfg.R.StaticFile("/styles.css", "./res/static/styles.css")
 	cfg.R.StaticFile("/favicon.ico", "./res/static/favicon.ico")
 
-	web := cfg.R.Group(cfg.BaseUrl)
-	web.GET("/", h.main_page)
+	web := cfg.R.Group(cfg.BaseURL)
+	web.GET("/", h.mainPage)
 
-	web_board := web.Group("/:board")
-	web_board.POST("/newthread", h.newthread)
-	web_board.GET("/", h.redirect_to_zero_page) //TODO: redirect to /page/0/
-	web_board.GET("/page/:page", h.board_page)
+	webBoard := web.Group("/:board")
+	webBoard.POST("/newthread", h.newthread)
+	webBoard.GET("/", h.redirectToZeroPage) //TODO: redirect to /page/0/
+	webBoard.GET("/page/:page", h.boardPage)
 
-	web_thread := web_board.Group("/thread/:thread")
-	web_thread.GET("/", h.thread_page)
-	web_thread.POST("/reply", h.reply)
+	webThread := webBoard.Group("/thread/:thread")
+	webThread.GET("/", h.threadPage)
+	webThread.POST("/reply", h.reply)
 }
 
-func SetApiHandler(cfg *HandlerConfig) {
-	h := &ApiHandler{
+func SetAPIHandler(cfg *Config) {
+	h := &APIHandler{
 		userspace: cfg.Userspace,
 		r:         cfg.R,
 	}
-	api := cfg.R.Group(cfg.BaseUrl)
-	api.GET("/boards", h.get_boards)
-	api_board := api.Group("/:board")
+	api := cfg.R.Group(cfg.BaseURL)
+	api.GET("/boards", h.getBoards)
+	apiBoard := api.Group("/:board")
 
-	api_board.GET("/threads", h.get_threads)
-	api_board.GET("/catalog", h.get_catalog)
-	api_board.GET("/archive", h.get_archive)
-	api_board.GET("/:page", h.get_page)
-	api_board.GET("/thread/:op", h.get_thread)
+	apiBoard.GET("/threads", h.getThreads)
+	apiBoard.GET("/catalog", h.getCatalog)
+	apiBoard.GET("/archive", h.getArchive)
+	apiBoard.GET("/:page", h.getPage)
+	apiBoard.GET("/thread/:op", h.getThread)
 }

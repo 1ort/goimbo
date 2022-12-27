@@ -20,7 +20,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (h *WebHandler) main_page(c *gin.Context) {
+func (h *WebHandler) mainPage(c *gin.Context) {
 	boards, err := h.userspace.GetBoards(c.Request.Context())
 	if err != nil {
 		c.JSON(model.Status(err), gin.H{
@@ -34,26 +34,26 @@ func (h *WebHandler) main_page(c *gin.Context) {
 	})
 }
 
-func (h *WebHandler) redirect_to_zero_page(c *gin.Context) {
+func (h *WebHandler) redirectToZeroPage(c *gin.Context) {
 	board := c.Param("board")
 	//c.Params = append(c.Params, gin.Param{Key: "page", Value: "0"})
 	//h.board_page(c)
 	c.Redirect(http.StatusFound, fmt.Sprintf("/%s/page/0", board))
 }
 
-func (h *WebHandler) board_page(c *gin.Context) {
+func (h *WebHandler) boardPage(c *gin.Context) {
 	board := c.Param("board")
-	page := c.Param("page")
-	page_n, err := strconv.Atoi(page)
+	rawPage := c.Param("page")
+	page, err := strconv.Atoi(rawPage)
 	if err != nil {
-		err := model.NewNotFound("page", page)
+		err := model.NewNotFound("page", rawPage)
 		c.JSON(model.Status(err), gin.H{
 			"status": model.Status(err),
 			"result": err,
 		})
 		return
 	}
-	board_data, err := h.userspace.GetBoard(c.Request.Context(), board)
+	boardData, err := h.userspace.GetBoard(c.Request.Context(), board)
 	if err != nil {
 		c.JSON(model.Status(err), gin.H{
 			"status": model.Status(err),
@@ -61,7 +61,7 @@ func (h *WebHandler) board_page(c *gin.Context) {
 		})
 		return
 	}
-	page_data, err := h.userspace.GetBoardPage(c.Request.Context(), board, page_n)
+	pageData, err := h.userspace.GetBoardPage(c.Request.Context(), board, page)
 	if err != nil {
 		c.JSON(model.Status(err), gin.H{
 			"status": model.Status(err),
@@ -70,16 +70,16 @@ func (h *WebHandler) board_page(c *gin.Context) {
 		return
 	}
 	c.HTML(http.StatusOK, "board.page.tmpl", gin.H{
-		"Page":    page_data.Page,
-		"Threads": page_data.Threads,
-		"Board":   board_data,
+		"Page":    pageData.Page,
+		"Threads": pageData.Threads,
+		"Board":   boardData,
 	})
 }
 
-func (h *WebHandler) thread_page(c *gin.Context) {
+func (h *WebHandler) threadPage(c *gin.Context) {
 	board := c.Param("board")
-	thread := c.Param("thread")
-	board_data, err := h.userspace.GetBoard(c.Request.Context(), board)
+	rawThread := c.Param("thread")
+	boardData, err := h.userspace.GetBoard(c.Request.Context(), board)
 	if err != nil {
 		c.JSON(model.Status(err), gin.H{
 			"status": model.Status(err),
@@ -87,19 +87,19 @@ func (h *WebHandler) thread_page(c *gin.Context) {
 		})
 		return
 	}
-	thread_n, err := strconv.Atoi(thread)
+	thread, err := strconv.Atoi(rawThread)
 	if err != nil {
-		err := model.NewNotFound("page", thread)
+		err := model.NewNotFound("page", rawThread)
 		c.JSON(model.Status(err), gin.H{
 			"status": model.Status(err),
 			"result": err,
 		})
 		return
 	}
-	thread_data, err := h.userspace.GetThread(c.Request.Context(), board, thread_n)
+	threadData, err := h.userspace.GetThread(c.Request.Context(), board, thread)
 	if err != nil {
 		fmt.Printf("%v \n", err)
-		err := model.NewNotFound("page", thread)
+		err := model.NewNotFound("page", rawThread)
 		c.JSON(model.Status(err), gin.H{
 			"status": model.Status(err),
 			"result": err,
@@ -107,18 +107,18 @@ func (h *WebHandler) thread_page(c *gin.Context) {
 		return
 	}
 	c.HTML(http.StatusOK, "thread.page.tmpl", gin.H{
-		"board_data": board_data,
-		"OP":         thread_data.OP,
-		"Replies":    thread_data.Replies,
+		"board_data": boardData,
+		"OP":         threadData.OP,
+		"Replies":    threadData.Replies,
 	})
 }
 
 func (h *WebHandler) reply(c *gin.Context) {
 	board := c.Param("board")
-	thread := c.Param("thread")
-	thread_n, err := strconv.Atoi(thread)
+	rawThread := c.Param("thread")
+	thread, err := strconv.Atoi(rawThread)
 	if err != nil {
-		err := model.NewNotFound("page", thread)
+		err := model.NewNotFound("page", rawThread)
 		c.JSON(model.Status(err), gin.H{
 			"status": model.Status(err),
 			"result": err,
@@ -126,7 +126,7 @@ func (h *WebHandler) reply(c *gin.Context) {
 		return
 	}
 	com := c.PostForm("text")
-	newPost, err := h.userspace.Reply(c.Request.Context(), board, com, thread_n)
+	newPost, err := h.userspace.Reply(c.Request.Context(), board, com, thread)
 	if err != nil {
 		c.JSON(model.Status(err), gin.H{
 			"status": model.Status(err),
@@ -134,7 +134,7 @@ func (h *WebHandler) reply(c *gin.Context) {
 		})
 		return
 	}
-	c.Redirect(http.StatusFound, fmt.Sprintf("/%s/thread/%v#%v", board, thread_n, newPost.No))
+	c.Redirect(http.StatusFound, fmt.Sprintf("/%s/thread/%v#%v", board, thread, newPost.No))
 }
 
 func (h *WebHandler) newthread(c *gin.Context) {

@@ -21,7 +21,7 @@ type BoardRepository interface {
 type PostRepository interface {
 	NewPost(ctx context.Context, board, com string, parent int) (*Post, error)
 	GetSingle(ctx context.Context, board string, no int) (*Post, error)
-	GetMultiple(ctx context.Context, board string, parent int, skip, limit int, reverse, sort_by_last_modified bool) ([]*Post, error)
+	GetMultiple(ctx context.Context, board string, parent int, skip, limit int, reverse, sortByLastModified bool) ([]*Post, error)
 	Count(ctx context.Context, board string, parent int) (int, error)
 }
 
