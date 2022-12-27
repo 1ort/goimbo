@@ -12,12 +12,12 @@ type Config struct {
 		Host string `yaml:"host"`
 		Port string `yaml:"port"`
 	}
-	Api struct {
-		BaseUrl string `yaml:"base_url"`
+	API struct {
+		BaseURL string `yaml:"base_url"`
 		Enabled bool   `yaml:"enabled"`
 	}
 	Web struct {
-		BaseUrl string `yaml:"base_url"`
+		BaseURL string `yaml:"base_url"`
 		Enabled bool   `yaml:"enabled"`
 	}
 	Db struct {
@@ -30,34 +30,34 @@ type Config struct {
 }
 
 func ReadConfig(configPath string) *Config {
-	config_file, err := os.ReadFile(configPath)
+	configFile, err := os.ReadFile(configPath)
 	if err != nil {
 		panic(fmt.Sprintf("Can not open config file, error: %s", err))
 	}
 	var cfg Config
-	err = yaml.Unmarshal(config_file, &cfg)
+	err = yaml.Unmarshal(configFile, &cfg)
 	if err != nil {
 		panic(fmt.Sprintf("Can not parse config file, error: %s", err))
 	}
 	return &cfg
 }
 
-func (cfg *Config) GetDataBaseUrl() string {
-	db_template := "postgresql://%s:%s/%s?user=%s&password=%s"
-	db_url := fmt.Sprintf(db_template, cfg.Db.Host, cfg.Db.Port, cfg.Db.Name, cfg.Db.User, cfg.Db.Pass)
-	return db_url
+func (cfg *Config) GetDataBaseURL() string {
+	templateURL := "postgresql://%s:%s/%s?user=%s&password=%s"
+	dbURL := fmt.Sprintf(templateURL, cfg.Db.Host, cfg.Db.Port, cfg.Db.Name, cfg.Db.User, cfg.Db.Pass)
+	return dbURL
 }
 
 func (cfg *Config) GetAppAddr() string {
-	addr_template := "%s:%s"
-	addr := fmt.Sprintf(addr_template, cfg.App.Host, cfg.App.Port)
+	templateAddr := "%s:%s"
+	addr := fmt.Sprintf(templateAddr, cfg.App.Host, cfg.App.Port)
 	return addr
 }
 
-func (cfg *Config) GetBaseApiUrl() string {
-	return (cfg.Api.BaseUrl)
+func (cfg *Config) GetBaseAPIURL() string {
+	return (cfg.API.BaseURL)
 }
 
-func (cfg *Config) GetBaseWebUrl() string {
-	return (cfg.Web.BaseUrl)
+func (cfg *Config) GetBaseWebURL() string {
+	return (cfg.Web.BaseURL)
 }

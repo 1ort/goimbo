@@ -19,7 +19,7 @@ func main() {
 
 	config := ReadConfig(*confPtr)
 
-	pgpool, err := pgxpool.New(context.Background(), config.GetDataBaseUrl())
+	pgpool, err := pgxpool.New(context.Background(), config.GetDataBaseURL())
 	if err != nil {
 		panic(err)
 	}
@@ -43,24 +43,24 @@ func main() {
 			PostRepository:  postrepo,
 		})
 
-	if !config.Web.Enabled && !config.Api.Enabled {
+	if !config.Web.Enabled && !config.API.Enabled {
 		fmt.Println("At least one: Web or API must be enabled. Enable in config")
 		return
 	}
 	router := gin.Default()
 	if config.Web.Enabled {
 		handler.SetWebHandler(
-			&handler.HandlerConfig{
+			&handler.Config{
 				R:         router,
-				BaseUrl:   config.Web.BaseUrl,
+				BaseURL:   config.Web.BaseURL,
 				Userspace: userspace,
 			})
 	}
-	if config.Api.Enabled {
-		handler.SetApiHandler(
-			&handler.HandlerConfig{
+	if config.API.Enabled {
+		handler.SetAPIHandler(
+			&handler.Config{
 				R:         router,
-				BaseUrl:   config.Api.BaseUrl,
+				BaseURL:   config.API.BaseURL,
 				Userspace: userspace,
 			})
 	}

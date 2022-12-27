@@ -63,43 +63,43 @@ func (u *UserspaceService) GetThreadPreview(ctx context.Context, board string, n
 }
 
 func (u *UserspaceService) getThreadPreviewByOp(ctx context.Context, op *model.Post) (*model.ThreadPreview, error) {
-	replies_count, err := u.PostRepository.Count(ctx, op.Board, op.No)
+	repliesCount, err := u.PostRepository.Count(ctx, op.Board, op.No)
 	if err != nil {
 		return nil, err
 	}
-	ommited_posts := replies_count - u.PreviewPosts
-	if ommited_posts < 0 {
-		ommited_posts = 0
+	ommitedPosts := repliesCount - u.PreviewPosts
+	if ommitedPosts < 0 {
+		ommitedPosts = 0
 	}
-	replies, err := u.PostRepository.GetMultiple(ctx, op.Board, op.No, ommited_posts, 0, false, false)
+	replies, err := u.PostRepository.GetMultiple(ctx, op.Board, op.No, ommitedPosts, 0, false, false)
 	if err != nil {
 		return nil, err
 	}
-	last_modified := op.Time
+	LastModified := op.Time
 	if len(replies) > 0 {
-		last_modified = replies[len(replies)-1].Time
+		LastModified = replies[len(replies)-1].Time
 	}
 	return &model.ThreadPreview{
 		OP:             op,
-		TotalReplies:   replies_count,
-		OmittedReplies: ommited_posts,
+		TotalReplies:   repliesCount,
+		OmittedReplies: ommitedPosts,
 		LastReplies:    replies,
-		LastModified:   last_modified,
+		LastModified:   LastModified,
 	}, nil
 }
 
 /*TODO: Зафакапил, нужно было сначала сортировать, а потом делить на страницы*/
 func (u *UserspaceService) GetBoardPage(ctx context.Context, board string, page int) (*model.BoardPage, error) {
-	var limit, offset, total_threads, total_pages int
+	var limit, offset, totalThreads, totalPages int
 	var threads []*model.ThreadPreview
 	limit = u.ThreadsPerPage
 	offset = u.ThreadsPerPage * page
-	total_threads, err := u.PostRepository.Count(ctx, board, 0)
+	totalThreads, err := u.PostRepository.Count(ctx, board, 0)
 	if err != nil {
 		return nil, err
 	}
-	total_pages = int(math.Ceil(float64(total_threads) / float64(u.ThreadsPerPage)))
-	if page >= total_pages && total_pages != 0 {
+	totalPages = int(math.Ceil(float64(totalThreads) / float64(u.ThreadsPerPage)))
+	if page >= totalPages && totalPages != 0 {
 		//fmt.Printf("page: %v, total_pages")
 		return nil, model.NewNotFound("page", strconv.Itoa(page))
 	}
@@ -122,7 +122,7 @@ func (u *UserspaceService) GetBoardPage(ctx context.Context, board string, page 
 	return &model.BoardPage{
 		Page: &model.PageValue{
 			CurrentPage: page,
-			TotalPages:  total_pages,
+			TotalPages:  totalPages,
 		},
 		Threads: threads,
 	}, nil
