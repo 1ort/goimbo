@@ -32,8 +32,8 @@ go build .
 # To-Do
 
 - [x] Read-only API
+- [x] CSRF protection
 - [ ] Post API using tokens
-- [ ] CSRF protection
 - [ ] Captcha
 - [ ] Admin functionality
 - [ ] Upload images and files
