@@ -21,5 +21,4 @@ func IntRange(n int) []int {
 // add line breakes
 func FormatBody(body string) template.HTML {
 	return template.HTML(strings.Replace(template.HTMLEscapeString(body), "\n", "<br>", -1))
-	//return body
 }

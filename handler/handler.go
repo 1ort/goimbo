@@ -4,11 +4,21 @@ import (
 	"html/template"
 
 	"github.com/1ort/goimbo/model"
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
+	csrf "github.com/utrack/gin-csrf"
 )
 
-// Сюда будем передавать всё что нужно для инициализации хандлера
-type Config struct {
+type WebConfig struct {
+	R            *gin.Engine //router
+	BaseURL      string
+	Userspace    model.Userspace
+	CookieSecret string
+	XCSRFSecret  string
+}
+
+type APIConfig struct {
 	R         *gin.Engine //router
 	BaseURL   string
 	Userspace model.Userspace
@@ -24,7 +34,7 @@ type APIHandler struct {
 	r         *gin.Engine
 }
 
-func SetWebHandler(cfg *Config) {
+func SetWebHandler(cfg *WebConfig) {
 	h := &WebHandler{
 		userspace: cfg.Userspace,
 		r:         cfg.R,
@@ -51,6 +61,15 @@ func SetWebHandler(cfg *Config) {
 	cfg.R.StaticFile("/favicon.ico", "./res/static/favicon.ico")
 
 	web := cfg.R.Group(cfg.BaseURL)
+	store := cookie.NewStore([]byte(cfg.CookieSecret))
+	web.Use(sessions.Sessions("main", store))
+	web.Use(csrf.Middleware(csrf.Options{
+		Secret: cfg.XCSRFSecret,
+		ErrorFunc: func(c *gin.Context) {
+			c.String(400, "CSRF token mismatch")
+			c.Abort()
+		},
+	}))
 	web.GET("/", h.mainPage)
 
 	webBoard := web.Group("/:board")
@@ -63,7 +82,7 @@ func SetWebHandler(cfg *Config) {
 	webThread.POST("/reply", h.reply)
 }
 
-func SetAPIHandler(cfg *Config) {
+func SetAPIHandler(cfg *APIConfig) {
 	h := &APIHandler{
 		userspace: cfg.Userspace,
 		r:         cfg.R,

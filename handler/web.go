@@ -1,16 +1,5 @@
 package handler
 
-/*
-	web := cfg.R.Group(cfg.WebBaseUrl)
-	web.GET("/", h.main_page)
-	web_board := web.Group("/:board")
-	web_board.GET("/", h.board_page)
-	web_thread := web_board.Group("/:thread")
-	web_thread.GET("/", h.thread_page)
-	web_board.POST("/reply", h.reply)
-	web_board.POST("/newthread", h.newthread)
-*/
-
 import (
 	"fmt"
 	"net/http"
@@ -18,6 +7,7 @@ import (
 
 	"github.com/1ort/goimbo/model"
 	"github.com/gin-gonic/gin"
+	csrf "github.com/utrack/gin-csrf"
 )
 
 func (h *WebHandler) mainPage(c *gin.Context) {
@@ -30,14 +20,13 @@ func (h *WebHandler) mainPage(c *gin.Context) {
 		return
 	}
 	c.HTML(http.StatusOK, "dir.page.tmpl", gin.H{
-		"Boards": boards,
+		"Boards":      boards,
+		"XCSRF_TOKEN": csrf.GetToken(c),
 	})
 }
 
 func (h *WebHandler) redirectToZeroPage(c *gin.Context) {
 	board := c.Param("board")
-	//c.Params = append(c.Params, gin.Param{Key: "page", Value: "0"})
-	//h.board_page(c)
 	c.Redirect(http.StatusFound, fmt.Sprintf("/%s/page/0", board))
 }
 
@@ -70,9 +59,10 @@ func (h *WebHandler) boardPage(c *gin.Context) {
 		return
 	}
 	c.HTML(http.StatusOK, "board.page.tmpl", gin.H{
-		"Page":    pageData.Page,
-		"Threads": pageData.Threads,
-		"Board":   boardData,
+		"Page":        pageData.Page,
+		"Threads":     pageData.Threads,
+		"Board":       boardData,
+		"XCSRF_TOKEN": csrf.GetToken(c),
 	})
 }
 
@@ -106,10 +96,13 @@ func (h *WebHandler) threadPage(c *gin.Context) {
 		})
 		return
 	}
+	xCSRFToken := csrf.GetToken(c)
+	fmt.Printf("token: %s", xCSRFToken)
 	c.HTML(http.StatusOK, "thread.page.tmpl", gin.H{
-		"board_data": boardData,
-		"OP":         threadData.OP,
-		"Replies":    threadData.Replies,
+		"board_data":  boardData,
+		"OP":          threadData.OP,
+		"Replies":     threadData.Replies,
+		"XCSRF_TOKEN": xCSRFToken,
 	})
 }
 
@@ -140,7 +133,6 @@ func (h *WebHandler) reply(c *gin.Context) {
 func (h *WebHandler) newthread(c *gin.Context) {
 	board := c.Param("board")
 	com := c.PostForm("text")
-	fmt.Printf("Newthread: %s", com)
 	newPost, err := h.userspace.NewThread(c.Request.Context(), board, com)
 	if err != nil {
 		c.JSON(model.Status(err), gin.H{

@@ -17,8 +17,10 @@ type Config struct {
 		Enabled bool   `yaml:"enabled"`
 	}
 	Web struct {
-		BaseURL string `yaml:"base_url"`
-		Enabled bool   `yaml:"enabled"`
+		BaseURL      string `yaml:"base_url"`
+		Enabled      bool   `yaml:"enabled"`
+		CookieSecret string `yaml:"cookie_storage_key"`
+		XCSRFSecret  string `yaml:"x_csrf_secret"`
 	}
 	Db struct {
 		Host string `yaml:"host"`

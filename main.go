@@ -50,7 +50,7 @@ func main() {
 	router := gin.Default()
 	if config.API.Enabled {
 		handler.SetAPIHandler(
-			&handler.Config{
+			&handler.APIConfig{
 				R:         router,
 				BaseURL:   config.API.BaseURL,
 				Userspace: userspace,
@@ -58,10 +58,12 @@ func main() {
 	}
 	if config.Web.Enabled {
 		handler.SetWebHandler(
-			&handler.Config{
-				R:         router,
-				BaseURL:   config.Web.BaseURL,
-				Userspace: userspace,
+			&handler.WebConfig{
+				R:            router,
+				BaseURL:      config.Web.BaseURL,
+				Userspace:    userspace,
+				CookieSecret: config.Web.CookieSecret,
+				XCSRFSecret:  config.Web.XCSRFSecret,
 			})
 	}
 	router.Run(config.GetAppAddr()) //nolint
