@@ -30,11 +30,10 @@ go build .
 ```
 
 # To-Do
-
 - [x] Read-only API
 - [x] CSRF protection
+- [x] Captcha
 - [ ] Post API using tokens
-- [ ] Captcha
 - [ ] Admin functionality
 - [ ] Upload images and files
 - [ ] Tripcodes
