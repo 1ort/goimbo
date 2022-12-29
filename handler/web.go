@@ -3,13 +3,36 @@ package handler
 import (
 	"fmt"
 	"net/http"
-	"strconv"
 
 	"github.com/1ort/goimbo/model"
 	"github.com/dchest/captcha"
 	"github.com/gin-gonic/gin"
 	csrf "github.com/utrack/gin-csrf"
 )
+
+// TODO: Put it all in separate files and add the bindall function
+type CaptchaRequest struct {
+	ID       string `form:"captchaId" binding:"required"`
+	Solution string `form:"captchaSolution" binding:"required"`
+}
+
+type PostRequest struct {
+	Com string `form:"text" binding:"required"`
+}
+
+type BoardRequest struct {
+	Board string `uri:"board" binding:"required"`
+}
+
+type BoardPageRequest struct {
+	BoardRequest
+	Page int `uri:"page" binding:"gte=0"`
+}
+
+type ThreadPageRequest struct {
+	BoardRequest
+	Thread int `uri:"thread" binding:"gte=0"`
+}
 
 func (h *WebHandler) handleError(c *gin.Context, err error) bool {
 	if err == nil {
@@ -24,6 +47,22 @@ func (h *WebHandler) handleError(c *gin.Context, err error) bool {
 	}
 	c.HTML(model.Status(err), "error.page.tmpl", m)
 	return true
+}
+
+// TODO: Move captcha to a separate interface
+func (h *WebHandler) verifyCaptcha(c *gin.Context) error {
+	if !h.enableCaptcha {
+		return nil
+	}
+	var cr CaptchaRequest
+	if err := c.ShouldBind(&cr); err != nil {
+		return model.NewBadRequest("Captcha error")
+	}
+	verified := captcha.VerifyString(cr.ID, cr.Solution)
+	if !verified {
+		return model.NewBadRequest("Incorrect captcha")
+	}
+	return nil
 }
 
 func (h *WebHandler) mainPage(c *gin.Context) {
@@ -42,20 +81,18 @@ func (h *WebHandler) redirectToZeroPage(c *gin.Context) {
 	c.Redirect(http.StatusFound, fmt.Sprintf("/%s/page/0", board))
 }
 
+// TODO: Do not create captcha if disabled
 func (h *WebHandler) boardPage(c *gin.Context) {
-	board := c.Param("board")
-	rawPage := c.Param("page")
-	page, err := strconv.Atoi(rawPage)
-	if err != nil {
-		err := model.NewNotFound("page", rawPage)
-		h.handleError(c, err)
+	var p BoardPageRequest
+	if err := c.ShouldBindUri(&p); err != nil {
+		h.handleError(c, model.NewBadRequest("Invalid board or page"))
 		return
 	}
-	boardData, err := h.userspace.GetBoard(c.Request.Context(), board)
+	boardData, err := h.userspace.GetBoard(c.Request.Context(), p.Board)
 	if handled := h.handleError(c, err); handled {
 		return
 	}
-	pageData, err := h.userspace.GetBoardPage(c.Request.Context(), board, page)
+	pageData, err := h.userspace.GetBoardPage(c.Request.Context(), p.Board, p.Page)
 	if handled := h.handleError(c, err); handled {
 		return
 	}
@@ -72,19 +109,16 @@ func (h *WebHandler) boardPage(c *gin.Context) {
 }
 
 func (h *WebHandler) threadPage(c *gin.Context) {
-	board := c.Param("board")
-	rawThread := c.Param("thread")
-	boardData, err := h.userspace.GetBoard(c.Request.Context(), board)
+	var p ThreadPageRequest
+	if err := c.ShouldBindUri(&p); err != nil {
+		h.handleError(c, model.NewBadRequest("Invalid thread"))
+		return
+	}
+	boardData, err := h.userspace.GetBoard(c.Request.Context(), p.Board)
 	if handled := h.handleError(c, err); handled {
 		return
 	}
-	thread, err := strconv.Atoi(rawThread)
-	if err != nil {
-		err := model.NewNotFound("thread", rawThread)
-		h.handleError(c, err)
-		return
-	}
-	threadData, err := h.userspace.GetThread(c.Request.Context(), board, thread)
+	threadData, err := h.userspace.GetThread(c.Request.Context(), p.Board, p.Thread)
 	if handled := h.handleError(c, err); handled {
 		return
 	}
@@ -102,44 +136,51 @@ func (h *WebHandler) threadPage(c *gin.Context) {
 }
 
 func (h *WebHandler) reply(c *gin.Context) {
-	board := c.Param("board")
-	rawThread := c.Param("thread")
-	thread, err := strconv.Atoi(rawThread)
-	if err != nil {
-		err := model.NewNotFound("thread", rawThread)
-		h.handleError(c, err)
+	var t ThreadPageRequest
+	var p PostRequest
+
+	if err := c.ShouldBindUri(&t); err != nil {
+		h.handleError(c, model.NewBadRequest("Invalid thread"))
 		return
 	}
-	captchaID := c.PostForm("captchaId")
-	captchaSolution := c.PostForm("captchaSolution")
-	verified := captcha.VerifyString(captchaID, captchaSolution)
-	if !verified {
-		err := model.NewBadRequest("Incorrect captcha")
-		h.handleError(c, err)
+	if err := c.ShouldBind(&p); err != nil {
+		h.handleError(c, model.NewBadRequest("Invalid post content"))
 		return
 	}
-	com := c.PostForm("text")
-	newPost, err := h.userspace.Reply(c.Request.Context(), board, com, thread)
+
+	err := h.verifyCaptcha(c)
 	if handled := h.handleError(c, err); handled {
 		return
 	}
-	c.Redirect(http.StatusFound, fmt.Sprintf("/%s/thread/%v#%v", board, thread, newPost.No))
+
+	newPost, err := h.userspace.Reply(c.Request.Context(), t.Board, p.Com, t.Thread)
+	if handled := h.handleError(c, err); handled {
+		return
+	}
+	c.Redirect(http.StatusFound, fmt.Sprintf("/%s/thread/%v#%v", t.Board, t.Thread, newPost.No))
 }
 
 func (h *WebHandler) newthread(c *gin.Context) {
-	board := c.Param("board")
-	com := c.PostForm("text")
-	captchaID := c.PostForm("captchaId")
-	captchaSolution := c.PostForm("captchaSolution")
-	verified := captcha.VerifyString(captchaID, captchaSolution)
-	if !verified {
-		err := model.NewBadRequest("Captcha incorrect")
-		h.handleError(c, err)
+	var b BoardRequest
+	var p PostRequest
+
+	if err := c.ShouldBindUri(&b); err != nil {
+		h.handleError(c, model.NewBadRequest("Invalid board"))
 		return
 	}
-	newPost, err := h.userspace.NewThread(c.Request.Context(), board, com)
+	if err := c.ShouldBind(&p); err != nil {
+		h.handleError(c, model.NewBadRequest("Invalid post content"))
+		return
+	}
+
+	err := h.verifyCaptcha(c)
 	if handled := h.handleError(c, err); handled {
 		return
 	}
-	c.Redirect(http.StatusFound, fmt.Sprintf("/%s/thread/%v", board, newPost.No))
+
+	newPost, err := h.userspace.NewThread(c.Request.Context(), b.Board, p.Com)
+	if handled := h.handleError(c, err); handled {
+		return
+	}
+	c.Redirect(http.StatusFound, fmt.Sprintf("/%s/thread/%v", b.Board, newPost.No))
 }
