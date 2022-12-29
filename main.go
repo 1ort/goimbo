@@ -64,7 +64,7 @@ func main() {
 				Userspace:     userspace,
 				CookieSecret:  config.Web.CookieSecret,
 				XCSRFSecret:   config.Web.XCSRFSecret,
-				EnableCaptcha: true,
+				EnableCaptcha: config.Web.EnableCaptcha,
 			})
 	}
 	router.Run(config.GetAppAddr()) //nolint
