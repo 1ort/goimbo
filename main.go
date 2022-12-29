@@ -48,21 +48,24 @@ func main() {
 		return
 	}
 	router := gin.Default()
-	if config.Web.Enabled {
-		handler.SetWebHandler(
-			&handler.Config{
-				R:         router,
-				BaseURL:   config.Web.BaseURL,
-				Userspace: userspace,
-			})
-	}
 	if config.API.Enabled {
 		handler.SetAPIHandler(
-			&handler.Config{
+			&handler.APIConfig{
 				R:         router,
 				BaseURL:   config.API.BaseURL,
 				Userspace: userspace,
 			})
 	}
-	router.Run(config.GetAppAddr())
+	if config.Web.Enabled {
+		handler.SetWebHandler(
+			&handler.WebConfig{
+				R:             router,
+				BaseURL:       config.Web.BaseURL,
+				Userspace:     userspace,
+				CookieSecret:  config.Web.CookieSecret,
+				XCSRFSecret:   config.Web.XCSRFSecret,
+				EnableCaptcha: true,
+			})
+	}
+	router.Run(config.GetAppAddr()) //nolint
 }

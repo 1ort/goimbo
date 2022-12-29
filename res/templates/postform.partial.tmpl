@@ -2,6 +2,7 @@
     <table>
         <tbody>
             <tr>
+                <input type="hidden" name="_csrf" value="{{.XCSRF_TOKEN}}">
                 <td class="postblock">
                     Comment
                 </td>
@@ -15,6 +16,17 @@
                         required=""></textarea>
                 </td>
             </tr>
+            {{if .captcha.enabled}}
+            <tr>
+                <td class="postblock">Captcha</td>
+                <td>
+                    <img id="captcha_image" src="/captcha/{{.captcha.ID}}.png">
+                    <br>
+                    <input type="text" name="captchaSolution" size="48">
+                    <input type="hidden" name="captchaId" value="{{.captcha.ID}}">
+                </td>
+            </tr>
+            {{end}}
             <tr>
                 <td></td>
                 <td> <input type="submit" value="Post"></td>
@@ -26,13 +38,13 @@
 {{/* Use top-level */}}
 {{define "threadform"}}
 <form id="threadform" action="/{{.Board.Slug}}/newthread" method="POST" enctype="multipart/form-data">
-    {{template "replytable"}}
+    {{template "replytable" .}}
 </form>
 {{end}}
 
-{{/* Use with OP-post */}}
+{{/* Use top-level */}}
 {{define "replyform"}}
-<form id="postform" action="/{{.Board}}/thread/{{.No}}/reply" method="POST" enctype="multipart/form-data">
-    {{template "replytable"}}
+<form id="postform" action="/{{.OP.Board}}/thread/{{.OP.No}}/reply" method="POST" enctype="multipart/form-data">
+    {{template "replytable" .}}
 </form>
 {{end}}

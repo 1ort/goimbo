@@ -13,3 +13,6 @@ api:
 web:
   base_url: /
   enabled: true
+  cookie_storage_key: SUPERSECRETKEY
+  x_csrf_secret: SUPERSECRETKEY
+  enable_captha: true

@@ -17,9 +17,9 @@
         </header>
         <main>
             <hr>
+            {{template "replyform" .}}
+            <hr>
             {{with .OP}}
-                {{template "replyform" .}}
-                <hr>
                 <div class="op_post_container">
                     {{template "post" .}}
                 </div>

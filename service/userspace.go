@@ -88,7 +88,6 @@ func (u *UserspaceService) getThreadPreviewByOp(ctx context.Context, op *model.P
 	}, nil
 }
 
-/*TODO: Зафакапил, нужно было сначала сортировать, а потом делить на страницы*/
 func (u *UserspaceService) GetBoardPage(ctx context.Context, board string, page int) (*model.BoardPage, error) {
 	var limit, offset, totalThreads, totalPages int
 	var threads []*model.ThreadPreview
@@ -100,7 +99,6 @@ func (u *UserspaceService) GetBoardPage(ctx context.Context, board string, page 
 	}
 	totalPages = int(math.Ceil(float64(totalThreads) / float64(u.ThreadsPerPage)))
 	if page >= totalPages && totalPages != 0 {
-		//fmt.Printf("page: %v, total_pages")
 		return nil, model.NewNotFound("page", strconv.Itoa(page))
 	}
 	ops, err := u.PostRepository.GetMultiple(ctx, board, 0, offset, limit, true, true)
@@ -115,10 +113,6 @@ func (u *UserspaceService) GetBoardPage(ctx context.Context, board string, page 
 		}
 		threads = append(threads, thread)
 	}
-	// //sort threads by last modified value
-	// sort.Slice(threads, func(i, j int) bool {
-	// 	return threads[i].LastModified.After(threads[j].LastModified)
-	// })
 	return &model.BoardPage{
 		Page: &model.PageValue{
 			CurrentPage: page,
