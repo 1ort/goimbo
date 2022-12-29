@@ -2,6 +2,7 @@ package handler
 
 import (
 	"html/template"
+	"net/http"
 
 	"github.com/1ort/goimbo/model"
 	"github.com/gin-contrib/sessions"
@@ -66,7 +67,7 @@ func SetWebHandler(cfg *WebConfig) {
 	web.Use(csrf.Middleware(csrf.Options{
 		Secret: cfg.XCSRFSecret,
 		ErrorFunc: func(c *gin.Context) {
-			c.String(400, "CSRF token mismatch")
+			c.Redirect(http.StatusSeeOther, "/") //TODO: error page template
 			c.Abort()
 		},
 	}))
