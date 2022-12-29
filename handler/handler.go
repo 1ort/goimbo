@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/1ort/goimbo/model"
+	"github.com/dchest/captcha"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
@@ -12,11 +13,12 @@ import (
 )
 
 type WebConfig struct {
-	R            *gin.Engine //router
-	BaseURL      string
-	Userspace    model.Userspace
-	CookieSecret string
-	XCSRFSecret  string
+	R             *gin.Engine //router
+	BaseURL       string
+	Userspace     model.Userspace
+	CookieSecret  string
+	XCSRFSecret   string
+	EnableCaptcha bool
 }
 
 type APIConfig struct {
@@ -26,8 +28,9 @@ type APIConfig struct {
 }
 
 type WebHandler struct {
-	userspace model.Userspace
-	r         *gin.Engine
+	userspace     model.Userspace
+	r             *gin.Engine
+	enableCaptcha bool
 }
 
 type APIHandler struct {
@@ -37,8 +40,9 @@ type APIHandler struct {
 
 func SetWebHandler(cfg *WebConfig) {
 	h := &WebHandler{
-		userspace: cfg.Userspace,
-		r:         cfg.R,
+		userspace:     cfg.Userspace,
+		r:             cfg.R,
+		enableCaptcha: cfg.EnableCaptcha,
 	}
 
 	funcmap := template.FuncMap{
@@ -53,13 +57,16 @@ func SetWebHandler(cfg *WebConfig) {
 			"res/templates/thread_preview.partial.tmpl",
 			"res/templates/footer.partial.tmpl",
 			"res/templates/navbar.partial.tmpl",
+
 			"res/templates/board.page.tmpl",
 			"res/templates/thread.page.tmpl",
 			"res/templates/dir.page.tmpl",
+			"res/templates/error.page.tmpl",
 		))
 	cfg.R.SetHTMLTemplate(tmpl)
 	cfg.R.StaticFile("/styles.css", "./res/static/styles.css")
 	cfg.R.StaticFile("/favicon.ico", "./res/static/favicon.ico")
+	cfg.R.StaticFile("error_img.png", "./res/static/gopher_vojak_transparent.png")
 
 	web := cfg.R.Group(cfg.BaseURL)
 	store := cookie.NewStore([]byte(cfg.CookieSecret))
@@ -81,6 +88,10 @@ func SetWebHandler(cfg *WebConfig) {
 	webThread := webBoard.Group("/thread/:thread")
 	webThread.GET("/", h.threadPage)
 	webThread.POST("/reply", h.reply)
+	if cfg.EnableCaptcha {
+		web.GET("/captcha/*id", gin.WrapH(captcha.Server(240, 80)))
+	}
+
 }
 
 func SetAPIHandler(cfg *APIConfig) {

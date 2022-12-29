@@ -3,6 +3,7 @@ module github.com/1ort/goimbo
 go 1.19
 
 require (
+	github.com/dchest/captcha v1.0.0
 	github.com/gin-contrib/sessions v0.0.5
 	github.com/gin-gonic/gin v1.8.1
 	github.com/jackc/pgx/v5 v5.2.0

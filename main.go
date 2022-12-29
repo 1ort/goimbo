@@ -59,11 +59,12 @@ func main() {
 	if config.Web.Enabled {
 		handler.SetWebHandler(
 			&handler.WebConfig{
-				R:            router,
-				BaseURL:      config.Web.BaseURL,
-				Userspace:    userspace,
-				CookieSecret: config.Web.CookieSecret,
-				XCSRFSecret:  config.Web.XCSRFSecret,
+				R:             router,
+				BaseURL:       config.Web.BaseURL,
+				Userspace:     userspace,
+				CookieSecret:  config.Web.CookieSecret,
+				XCSRFSecret:   config.Web.XCSRFSecret,
+				EnableCaptcha: true,
 			})
 	}
 	router.Run(config.GetAppAddr()) //nolint
