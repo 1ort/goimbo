@@ -138,6 +138,13 @@ html, body, h1, h2, p, form, table, td, textarea, input, div {
     border-radius: 5px;
     padding: 0.5em;
   }
+
+  form input[type="text"] {
+    width: 50%;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 0.5em;
+    }
   
   form input[type="submit"] {
     margin-top: 0.5em;
