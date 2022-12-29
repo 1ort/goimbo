@@ -4,8 +4,11 @@
 </p>
 
 # **Goimbo** is a Go-powered textboard / imageboard engine
+| Board View  | Thread view |
+| ------------- | ------------- |
+| ![Board](https://user-images.githubusercontent.com/83316072/209942828-d681d675-f0b6-4e42-b90a-86beef8a21a0.png)  | ![Thread](https://user-images.githubusercontent.com/83316072/209942437-0d63c4ce-54d4-41aa-9b0e-dbacbe45902e.png) |
 
-![Screenshot 2022-12-26 at 13-40-32 _c_ - Board C](https://user-images.githubusercontent.com/83316072/209534091-c05c4d4f-02cd-49f5-9f91-ff2601a6168d.png)
+
 
 # Setup
 It is assumed that you already have Go and GIt installed, as well as the Postgres database.
