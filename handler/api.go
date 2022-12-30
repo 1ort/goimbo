@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -9,13 +8,24 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func (h *APIHandler) handleError(c *gin.Context, err error) bool {
+	if err == nil {
+		return false
+	}
+	m := gin.H{
+		"status":  model.Status(err),
+		"message": err,
+	}
+	if model.Status(err) == 500 {
+		m["message"] = "Internal error"
+	}
+	c.JSON(model.Status(err), m)
+	return true
+}
+
 func (h *APIHandler) getBoards(c *gin.Context) {
 	boardList, err := h.userspace.GetBoards(c.Request.Context())
-	if err != nil {
-		c.JSON(model.Status(err), gin.H{
-			"status": model.Status(err),
-			"result": err,
-		})
+	if handled := h.handleError(c, err); handled {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
@@ -25,13 +35,13 @@ func (h *APIHandler) getBoards(c *gin.Context) {
 }
 
 func (h *APIHandler) getBoard(c *gin.Context) {
-	board := c.Param("board")
-	boardData, err := h.userspace.GetBoard(c.Request.Context(), board)
-	if err != nil {
-		c.JSON(model.Status(err), gin.H{
-			"status": model.Status(err),
-			"result": err,
-		})
+	var br BoardRequest
+	if err := c.ShouldBindUri(&br); err != nil {
+		h.handleError(c, model.NewBadRequest("Invalid board"))
+		return
+	}
+	boardData, err := h.userspace.GetBoard(c.Request.Context(), br.Board)
+	if handled := h.handleError(c, err); handled {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
@@ -41,31 +51,17 @@ func (h *APIHandler) getBoard(c *gin.Context) {
 }
 
 func (h *APIHandler) getPage(c *gin.Context) {
-	board := c.Param("board")
-	rawPage := c.Param("page")
-	page, err := strconv.Atoi(rawPage)
-	if err != nil {
-		err := model.NewNotFound("page", rawPage)
-		c.JSON(model.Status(err), gin.H{
-			"status": model.Status(err),
-			"result": err,
-		})
+	var bp BoardPageRequest
+	if err := c.ShouldBindUri(&bp); err != nil {
+		h.handleError(c, model.NewBadRequest("Invalid board or page"))
 		return
 	}
-	_, err = h.userspace.GetBoard(c.Request.Context(), board) //404 if board does not exist
-	if err != nil {
-		c.JSON(model.Status(err), gin.H{
-			"status": model.Status(err),
-			"result": err,
-		})
+	_, err := h.userspace.GetBoard(c.Request.Context(), bp.Board) //404 if board does not exist
+	if handled := h.handleError(c, err); handled {
 		return
 	}
-	pageData, err := h.userspace.GetBoardPage(c.Request.Context(), board, page)
-	if err != nil {
-		c.JSON(model.Status(err), gin.H{
-			"status": model.Status(err),
-			"result": err,
-		})
+	pageData, err := h.userspace.GetBoardPage(c.Request.Context(), bp.Board, bp.Page)
+	if handled := h.handleError(c, err); handled {
 		return
 	}
 	{
@@ -77,25 +73,15 @@ func (h *APIHandler) getPage(c *gin.Context) {
 }
 
 func (h *APIHandler) getThread(c *gin.Context) {
-	board := c.Param("board")
-	rawThread := c.Param("op")
-	thread, err := strconv.Atoi(rawThread)
-	if err != nil {
-		err := model.NewNotFound("thread", rawThread)
-		c.JSON(model.Status(err), gin.H{
-			"status": model.Status(err),
-			"result": err,
-		})
+	var t ThreadPageRequest
+	if err := c.ShouldBindUri(&t); err != nil {
+		h.handleError(c, model.NewBadRequest("Invalid board or thread number"))
 		return
 	}
-	threadData, err := h.userspace.GetThread(c.Request.Context(), board, thread)
+	threadData, err := h.userspace.GetThread(c.Request.Context(), t.Board, t.Thread)
 	if err != nil {
-		fmt.Printf("%v \n", err)
-		err := model.NewNotFound("page", rawThread)
-		c.JSON(model.Status(err), gin.H{
-			"status": model.Status(err),
-			"result": err,
-		})
+		err := model.NewNotFound("thread", strconv.Itoa(t.Thread))
+		h.handleError(c, err)
 		return
 	}
 	{
