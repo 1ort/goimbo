@@ -4,7 +4,7 @@
             <tr>
                 <input type="hidden" name="_csrf" value="{{.XCSRF_TOKEN}}">
                 <td class="postblock">
-                    Comment
+                    Comment:
                 </td>
                 <td>
                     <textarea 
@@ -14,6 +14,14 @@
                         minlength="3" 
                         maxlength="1500" 
                         required=""></textarea>
+                </td>
+            </tr>
+            <tr>
+                <td class="postblock">
+                    Files:
+                </td>
+                <td>
+                    <input type="file" name="files" multiple>
                 </td>
             </tr>
             {{if .captcha.enabled}}
