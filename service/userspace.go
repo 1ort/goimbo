@@ -39,11 +39,13 @@ func (u *UserspaceService) GetBoards(ctx context.Context) ([]*model.Board, error
 }
 
 func (u *UserspaceService) GetThread(ctx context.Context, board string, no int) (*model.Thread, error) {
+	if _, err := u.BoardRepository.GetBoard(ctx, board); err != nil {
+		return nil, model.NewNotFound("board", board)
+	}
 	op, err := u.getOP(ctx, board, no)
 	if err != nil {
 		return nil, err
 	}
-
 	replies, err := u.PostRepository.GetMultiple(ctx, board, no, 0, 0, false, false)
 	if err != nil {
 		return nil, err
@@ -55,6 +57,9 @@ func (u *UserspaceService) GetThread(ctx context.Context, board string, no int) 
 }
 
 func (u *UserspaceService) GetThreadPreview(ctx context.Context, board string, no int) (*model.ThreadPreview, error) {
+	if _, err := u.BoardRepository.GetBoard(ctx, board); err != nil {
+		return nil, model.NewNotFound("board", board)
+	}
 	op, err := u.getOP(ctx, board, no)
 	if err != nil {
 		return nil, err
@@ -89,6 +94,9 @@ func (u *UserspaceService) getThreadPreviewByOp(ctx context.Context, op *model.P
 }
 
 func (u *UserspaceService) GetBoardPage(ctx context.Context, board string, page int) (*model.BoardPage, error) {
+	if _, err := u.BoardRepository.GetBoard(ctx, board); err != nil {
+		return nil, model.NewNotFound("board", board)
+	}
 	var limit, offset, totalThreads, totalPages int
 	var threads []*model.ThreadPreview
 	limit = u.ThreadsPerPage
@@ -121,9 +129,11 @@ func (u *UserspaceService) GetBoardPage(ctx context.Context, board string, page 
 		Threads: threads,
 	}, nil
 }
+
 func (u *UserspaceService) NewThread(ctx context.Context, board, com string) (*model.Post, error) {
 	return u.PostRepository.NewPost(ctx, board, com, 0)
 }
+
 func (u *UserspaceService) Reply(ctx context.Context, board, com string, parent int) (*model.Post, error) {
 	_, err := u.getOP(ctx, board, parent)
 	if err != nil {
