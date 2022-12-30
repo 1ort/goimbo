@@ -43,7 +43,7 @@ func (h *WebHandler) handleError(c *gin.Context, err error) bool {
 		"message": err,
 	}
 	if model.Status(err) == 500 {
-		m["status"] = "Something went wrong"
+		m["message"] = "Something went wrong"
 	}
 	c.HTML(model.Status(err), "error.page.tmpl", m)
 	return true
