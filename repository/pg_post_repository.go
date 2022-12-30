@@ -8,7 +8,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-var schema = `CREATE TABLE IF NOT EXISTS posts (
+var postSchema = `CREATE TABLE IF NOT EXISTS posts (
 	no        INT         NOT NULL,
 	board     TEXT        NOT NULL,
 	parent    INT         NOT NULL,
@@ -31,7 +31,7 @@ func NewPGPostRepository(cfg *PgPostRepoConfig) model.PostRepository {
 	p := &PgPostRepository{
 		connPool: cfg.Pool,
 	}
-	_, err := p.connPool.Exec(context.Background(), schema)
+	_, err := p.connPool.Exec(context.Background(), postSchema)
 	if err != nil {
 		panic(err)
 	}
