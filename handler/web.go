@@ -10,30 +10,6 @@ import (
 	csrf "github.com/utrack/gin-csrf"
 )
 
-// TODO: Put it all in separate files and add the bindall function
-type CaptchaRequest struct {
-	ID       string `form:"captchaId" binding:"required"`
-	Solution string `form:"captchaSolution" binding:"required"`
-}
-
-type PostRequest struct {
-	Com string `form:"text" binding:"required"`
-}
-
-type BoardRequest struct {
-	Board string `uri:"board" binding:"required"`
-}
-
-type BoardPageRequest struct {
-	BoardRequest
-	Page int `uri:"page" binding:"gte=0"`
-}
-
-type ThreadPageRequest struct {
-	BoardRequest
-	Thread int `uri:"thread" binding:"gte=0"`
-}
-
 func (h *WebHandler) handleError(c *gin.Context, err error) bool {
 	if err == nil {
 		return false
