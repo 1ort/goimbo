@@ -8,6 +8,8 @@
 | ------------- | ------------- |
 | ![Board](https://user-images.githubusercontent.com/83316072/209942828-d681d675-f0b6-4e42-b90a-86beef8a21a0.png)  | ![Thread](https://user-images.githubusercontent.com/83316072/209942437-0d63c4ce-54d4-41aa-9b0e-dbacbe45902e.png) |
 
+## Dependency graph
+![изображение](https://user-images.githubusercontent.com/83316072/210071850-d1b3f328-c487-4c3e-8ae1-35a915f4c086.png)
 
 
 # Setup
