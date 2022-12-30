@@ -64,10 +64,8 @@ func SetWebHandler(cfg *WebConfig) {
 			"res/templates/error.page.tmpl",
 		))
 	cfg.R.SetHTMLTemplate(tmpl)
-	cfg.R.StaticFile("/styles.css", "./res/static/styles.css")
 	cfg.R.StaticFile("/favicon.ico", "./res/static/favicon.ico")
-	cfg.R.StaticFile("error_img.png", "./res/static/gopher_vojak_transparent.png")
-
+	cfg.R.Static("/static", "./res/static/")
 	web := cfg.R.Group(cfg.BaseURL)
 	store := cookie.NewStore([]byte(cfg.CookieSecret))
 	web.Use(sessions.Sessions("main", store))

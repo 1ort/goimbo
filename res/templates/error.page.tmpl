@@ -8,12 +8,12 @@
     <head>
         <meta charset='utf-8'>
         <title>{{template "error_title" .}}</title>
-        <link rel="stylesheet" href="/styles.css">
+        <link rel="stylesheet" href="/static/styles.css">
     </head>
     <body>
         <header>
             <h1>{{.status}}</h1>
-            <img id="error_image", class="error_image" src="/error_img.png">
+            <img id="error_image", class="error_image" src="/static/error_img.png">
             <h2>{{.message}}</h2>
         </header>
         <hr>
