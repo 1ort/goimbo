@@ -131,10 +131,16 @@ func (u *UserspaceService) GetBoardPage(ctx context.Context, board string, page 
 }
 
 func (u *UserspaceService) NewThread(ctx context.Context, board, com string) (*model.Post, error) {
+	if _, err := u.BoardRepository.GetBoard(ctx, board); err != nil {
+		return nil, model.NewNotFound("board", board)
+	}
 	return u.PostRepository.NewPost(ctx, board, com, 0)
 }
 
 func (u *UserspaceService) Reply(ctx context.Context, board, com string, parent int) (*model.Post, error) {
+	if _, err := u.BoardRepository.GetBoard(ctx, board); err != nil {
+		return nil, model.NewNotFound("board", board)
+	}
 	_, err := u.getOP(ctx, board, parent)
 	if err != nil {
 		return nil, err
