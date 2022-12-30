@@ -4,14 +4,6 @@ import (
 	"context"
 )
 
-/*
-TODO:
-Refactor PostRepository to meet the needs of the Userspace service
-
-Remove IsBoardExists in BoardRepository
-IsBoardExists can be implemented inside a service via GetBoard
-*/
-
 type BoardRepository interface {
 	NewBoard(ctx context.Context, slug, name, descr string) (*Board, error)
 	GetBoard(ctx context.Context, slug string) (*Board, error)
