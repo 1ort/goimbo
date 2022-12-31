@@ -1,11 +1,6 @@
 package handler
 
 // TODO: bindall() function
-type CaptchaRequest struct {
-	ID       string `form:"captchaId" binding:"required"`
-	Solution string `form:"captchaSolution" binding:"required"`
-}
-
 type PostRequest struct {
 	Com string `form:"text" binding:"required"`
 }

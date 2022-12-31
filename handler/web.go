@@ -2,13 +2,83 @@ package handler
 
 import (
 	"fmt"
+	"html/template"
 	"net/http"
 
 	"github.com/1ort/goimbo/model"
-	"github.com/dchest/captcha"
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 	csrf "github.com/utrack/gin-csrf"
 )
+
+type WebConfig struct {
+	R            *gin.Engine //router
+	BaseURL      string
+	Userspace    model.Userspace
+	CookieSecret string
+	XCSRFSecret  string
+	Captcha      WebCaptchaWrapper
+}
+
+type WebHandler struct {
+	userspace model.Userspace
+	r         *gin.Engine
+	captcha   WebCaptchaWrapper
+}
+
+func SetWebHandler(cfg *WebConfig) {
+	h := &WebHandler{
+		userspace: cfg.Userspace,
+		r:         cfg.R,
+		captcha:   cfg.Captcha,
+	}
+
+	funcmap := template.FuncMap{
+		"intRange":   IntRange,
+		"formatBody": FormatBody,
+		"captcha":    cfg.Captcha.presentCaptcha,
+	}
+
+	tmpl := template.Must(
+		template.New("").Funcs(funcmap).ParseFiles(
+			"res/templates/post.partial.tmpl",
+			"res/templates/postform.partial.tmpl",
+			"res/templates/thread_preview.partial.tmpl",
+			"res/templates/footer.partial.tmpl",
+			"res/templates/navbar.partial.tmpl",
+
+			"res/templates/board.page.tmpl",
+			"res/templates/thread.page.tmpl",
+			"res/templates/dir.page.tmpl",
+			"res/templates/error.page.tmpl",
+		))
+	cfg.R.SetHTMLTemplate(tmpl)
+	cfg.R.StaticFile("/favicon.ico", "./res/static/favicon.ico")
+	cfg.R.Static("/static", "./res/static/")
+	web := cfg.R.Group(cfg.BaseURL)
+	store := cookie.NewStore([]byte(cfg.CookieSecret))
+	web.Use(sessions.Sessions("main", store))
+	web.Use(csrf.Middleware(csrf.Options{
+		Secret: cfg.XCSRFSecret,
+		ErrorFunc: func(c *gin.Context) {
+			c.Redirect(http.StatusSeeOther, "/") //TODO: error page template
+			c.Abort()
+		},
+	}))
+	web.GET("/", h.mainPage)
+
+	webBoard := web.Group("/:board")
+	webBoard.POST("/newthread", h.newthread)
+	webBoard.GET("/", h.redirectToZeroPage) //redirects to /page/0/
+	webBoard.GET("/page/:page", h.boardPage)
+
+	webThread := webBoard.Group("/thread/:thread")
+	webThread.GET("/", h.threadPage)
+	webThread.POST("/reply", h.reply)
+	web.GET("/captcha/:id", gin.WrapF(h.captcha.ServeHTTP))
+
+}
 
 func (h *WebHandler) handleError(c *gin.Context, err error) bool {
 	if err == nil {
@@ -23,22 +93,6 @@ func (h *WebHandler) handleError(c *gin.Context, err error) bool {
 	}
 	c.HTML(model.Status(err), "error.page.tmpl", m)
 	return true
-}
-
-// TODO: Move captcha to a separate interface
-func (h *WebHandler) verifyCaptcha(c *gin.Context) error {
-	if !h.enableCaptcha {
-		return nil
-	}
-	var cr CaptchaRequest
-	if err := c.ShouldBind(&cr); err != nil {
-		return model.NewBadRequest("Captcha error")
-	}
-	verified := captcha.VerifyString(cr.ID, cr.Solution)
-	if !verified {
-		return model.NewBadRequest("Incorrect captcha")
-	}
-	return nil
 }
 
 func (h *WebHandler) mainPage(c *gin.Context) {
@@ -57,7 +111,6 @@ func (h *WebHandler) redirectToZeroPage(c *gin.Context) {
 	c.Redirect(http.StatusFound, fmt.Sprintf("/%s/page/0", board))
 }
 
-// TODO: Do not create captcha if disabled
 func (h *WebHandler) boardPage(c *gin.Context) {
 	var p BoardPageRequest
 	if err := c.ShouldBindUri(&p); err != nil {
@@ -77,10 +130,6 @@ func (h *WebHandler) boardPage(c *gin.Context) {
 		"Threads":     pageData.Threads,
 		"Board":       boardData,
 		"XCSRF_TOKEN": csrf.GetToken(c),
-		"captcha": gin.H{
-			"ID":      captcha.New(),
-			"enabled": h.enableCaptcha,
-		},
 	})
 }
 
@@ -104,10 +153,6 @@ func (h *WebHandler) threadPage(c *gin.Context) {
 		"OP":          threadData.OP,
 		"Replies":     threadData.Replies,
 		"XCSRF_TOKEN": xCSRFToken,
-		"captcha": gin.H{
-			"ID":      captcha.New(),
-			"enabled": h.enableCaptcha,
-		},
 	})
 }
 
@@ -124,7 +169,7 @@ func (h *WebHandler) reply(c *gin.Context) {
 		return
 	}
 
-	err := h.verifyCaptcha(c)
+	err := h.captcha.verify(c)
 	if handled := h.handleError(c, err); handled {
 		return
 	}
@@ -149,7 +194,7 @@ func (h *WebHandler) newthread(c *gin.Context) {
 		return
 	}
 
-	err := h.verifyCaptcha(c)
+	err := h.captcha.verify(c)
 	if handled := h.handleError(c, err); handled {
 		return
 	}

@@ -2,8 +2,10 @@ package model
 
 import (
 	"context"
+	"io"
 )
 
+// repository layer
 type BoardRepository interface {
 	NewBoard(ctx context.Context, slug, name, descr string) (*Board, error)
 	GetBoard(ctx context.Context, slug string) (*Board, error)
@@ -17,6 +19,7 @@ type PostRepository interface {
 	Count(ctx context.Context, board string, parent int) (int, error)
 }
 
+// service layer
 type Userspace interface {
 	GetBoards(ctx context.Context) ([]*Board, error)
 	GetBoard(ctx context.Context, slug string) (*Board, error)
@@ -28,4 +31,11 @@ type Userspace interface {
 }
 
 type Adminspace interface {
+}
+
+type Captcha interface {
+	New() (string, error)
+	Verify(id, solution string) (bool, error)
+	//Write captcha task
+	Write(w io.Writer, id string) error
 }

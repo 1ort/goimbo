@@ -47,6 +47,13 @@ func main() {
 		fmt.Println("At least one: Web or API must be enabled. Enable in config")
 		return
 	}
+
+	var captcha model.Captcha
+	if config.Web.EnableCaptcha {
+		captcha = service.NewImageCaptcha(
+			&service.ImageCaptchaConfig{})
+	}
+
 	router := gin.Default()
 	if config.API.Enabled {
 		handler.SetAPIHandler(
@@ -59,13 +66,14 @@ func main() {
 	if config.Web.Enabled {
 		handler.SetWebHandler(
 			&handler.WebConfig{
-				R:             router,
-				BaseURL:       config.Web.BaseURL,
-				Userspace:     userspace,
-				CookieSecret:  config.Web.CookieSecret,
-				XCSRFSecret:   config.Web.XCSRFSecret,
-				EnableCaptcha: config.Web.EnableCaptcha,
-			})
+				R:            router,
+				BaseURL:      config.Web.BaseURL,
+				Userspace:    userspace,
+				CookieSecret: config.Web.CookieSecret,
+				XCSRFSecret:  config.Web.XCSRFSecret,
+				Captcha:      *handler.NewWebCaptchaWrapper(captcha),
+			},
+		)
 	}
 	router.Run(config.GetAppAddr()) //nolint
 }

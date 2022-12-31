@@ -8,6 +8,31 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type APIConfig struct {
+	R         *gin.Engine //router
+	BaseURL   string
+	Userspace model.Userspace
+}
+
+type APIHandler struct {
+	userspace model.Userspace
+	r         *gin.Engine
+}
+
+func SetAPIHandler(cfg *APIConfig) {
+	h := &APIHandler{
+		userspace: cfg.Userspace,
+		r:         cfg.R,
+	}
+	api := cfg.R.Group(cfg.BaseURL)
+	api.GET("/boards", h.getBoards)
+
+	apiBoard := api.Group("/:board")
+	apiBoard.GET("/", h.getBoard)
+	apiBoard.GET("/:page", h.getPage)
+	apiBoard.GET("/thread/:op", h.getThread)
+}
+
 func (h *APIHandler) handleError(c *gin.Context, err error) bool {
 	if err == nil {
 		return false
