@@ -15,4 +15,16 @@ web:
   enabled: true
   cookie_storage_key: SUPERSECRETKEY
   x_csrf_secret: SUPERSECRETKEY
-  enable_captha: true
+  enable_captha: 
+attachment:
+  folder_path: ./attachment
+  allowed_extensions:
+  - png
+  - jpg
+  - jpeg
+  - gif
+  - webm
+  - webp
+  max_size_MB: 8.0
+  max_attachments: 4
+  min_attachments: 0

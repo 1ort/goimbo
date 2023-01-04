@@ -30,6 +30,13 @@ type Config struct {
 		Pass string `yaml:"pass"`
 		Name string `yaml:"name"`
 	}
+	Attachment struct {
+		Folder            string   `yaml:"folder_path"`
+		AllowedExtensions []string `yaml:"allowed_extensions"`
+		MaxSize           float32  `yaml:"max_size_MB"`
+		MaxAttachments    int      `yaml:"max_attachments"`
+		MinAttachments    int      `yaml:"min_attachments"`
+	}
 }
 
 func ReadConfig(configPath string) *Config {
