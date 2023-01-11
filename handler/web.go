@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
+	"path/filepath"
 
 	"github.com/1ort/goimbo/model"
 	"github.com/gin-contrib/sessions"
@@ -53,9 +54,10 @@ func SetWebHandler(cfg *WebConfig) {
 			"res/templates/dir.page.tmpl",
 			"res/templates/error.page.tmpl",
 		))
-	cfg.R.SetHTMLTemplate(tmpl)
-	cfg.R.StaticFile("/favicon.ico", "./res/static/favicon.ico")
-	cfg.R.Static("/static", "./res/static/")
+	h.r.SetHTMLTemplate(tmpl)
+	h.r.StaticFile("/favicon.ico", "./res/static/favicon.ico")
+	h.r.Static("/static", "./res/static/")
+
 	web := cfg.R.Group(cfg.BaseURL)
 	store := cookie.NewStore([]byte(cfg.CookieSecret))
 	web.Use(sessions.Sessions("main", store))
@@ -107,8 +109,7 @@ func (h *WebHandler) mainPage(c *gin.Context) {
 }
 
 func (h *WebHandler) redirectToZeroPage(c *gin.Context) {
-	board := c.Param("board")
-	c.Redirect(http.StatusFound, fmt.Sprintf("/%s/page/0", board))
+	c.Redirect(http.StatusFound, fmt.Sprintf("/%s/page/0", c.Param("board")))
 }
 
 func (h *WebHandler) boardPage(c *gin.Context) {
@@ -173,6 +174,22 @@ func (h *WebHandler) reply(c *gin.Context) {
 	if handled := h.handleError(c, err); handled {
 		return
 	}
+
+	//files uploading
+	form, err := c.MultipartForm()
+	if err != nil {
+		h.handleError(c, model.NewBadRequest("Form error"))
+		return
+	}
+	files := form.File["files"]
+	for _, file := range files {
+		filename := filepath.Base(file.Filename)
+		if err := c.SaveUploadedFile(file, filename); err != nil {
+			h.handleError(c, model.NewBadRequest("File upload error"))
+			return
+		}
+	}
+	//end file uploading
 
 	newPost, err := h.userspace.Reply(c.Request.Context(), t.Board, p.Com, t.Thread)
 	if handled := h.handleError(c, err); handled {
