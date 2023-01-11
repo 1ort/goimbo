@@ -32,7 +32,7 @@ func main() {
 				{Slug: "c", Name: "Board C", Descr: "Board C description"},
 			},
 		})
-	postrepo := repository.NewPGPostRepository(
+	postrepo := repository.NewpgPostRepository(
 		&repository.PgPostRepoConfig{
 			Pool: pgpool,
 		})
@@ -63,6 +63,21 @@ func main() {
 				Userspace: userspace,
 			})
 	}
+	attachementRepo := repository.NewPGAttachmentRepository(
+		&repository.PGAttachmentRepoConfig{
+			ConnPool: pgpool,
+		},
+	)
+	attachementService := service.NewAttachmentService(
+		&service.AttachmentServiceConfig{
+			Repo:              attachementRepo,
+			Folder:            "./upload",
+			AllowedExtensions: []string{"txt, png, jpg, jpeg"},
+			MaxSize:           float32(6400000),
+			MaxAttachments:    4,
+			MinAttachments:    0,
+		},
+	)
 	if config.Web.Enabled {
 		handler.SetWebHandler(
 			&handler.WebConfig{
@@ -72,6 +87,7 @@ func main() {
 				CookieSecret: config.Web.CookieSecret,
 				XCSRFSecret:  config.Web.XCSRFSecret,
 				Captcha:      *handler.NewWebCaptchaWrapper(captcha),
+				Attachments:  attachementService,
 			},
 		)
 	}

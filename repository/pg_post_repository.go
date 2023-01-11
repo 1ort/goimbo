@@ -19,7 +19,7 @@ var postSchema = `CREATE TABLE IF NOT EXISTS posts (
   );
 `
 
-type PgPostRepository struct {
+type pgPostRepository struct {
 	connPool *pgxpool.Pool
 }
 
@@ -27,8 +27,8 @@ type PgPostRepoConfig struct {
 	Pool *pgxpool.Pool
 }
 
-func NewPGPostRepository(cfg *PgPostRepoConfig) model.PostRepository {
-	p := &PgPostRepository{
+func NewpgPostRepository(cfg *PgPostRepoConfig) model.PostRepository {
+	p := &pgPostRepository{
 		connPool: cfg.Pool,
 	}
 	_, err := p.connPool.Exec(context.Background(), postSchema)
@@ -38,7 +38,7 @@ func NewPGPostRepository(cfg *PgPostRepoConfig) model.PostRepository {
 	return p
 }
 
-func (p *PgPostRepository) NewPost(ctx context.Context, board, com string, parent int) (*model.Post, error) {
+func (p *pgPostRepository) NewPost(ctx context.Context, board, com string, parent int) (*model.Post, error) {
 	queryTemplate :=
 		`INSERT INTO posts (no, board, parent, com, time)
 		VALUES (
@@ -59,7 +59,7 @@ func (p *PgPostRepository) NewPost(ctx context.Context, board, com string, paren
 	return &post, nil
 }
 
-func (p *PgPostRepository) GetSingle(ctx context.Context, board string, no int) (*model.Post, error) {
+func (p *pgPostRepository) GetSingle(ctx context.Context, board string, no int) (*model.Post, error) {
 	queryTemplate :=
 		`SELECT * FROM posts
 		WHERE board = $1 AND no = $2
@@ -75,7 +75,7 @@ func (p *PgPostRepository) GetSingle(ctx context.Context, board string, no int) 
 }
 
 /*reverse = from newer to older posts*/
-func (p *PgPostRepository) GetMultiple(ctx context.Context, board string, parent int, skip, limit int, reverse, sortByLastModified bool) ([]*model.Post, error) {
+func (p *pgPostRepository) GetMultiple(ctx context.Context, board string, parent int, skip, limit int, reverse, sortByLastModified bool) ([]*model.Post, error) {
 	if limit == 0 {
 		limit = 100_000
 	}
@@ -124,7 +124,7 @@ func (p *PgPostRepository) GetMultiple(ctx context.Context, board string, parent
 	return posts, nil
 }
 
-func (p *PgPostRepository) Count(ctx context.Context, board string, parent int) (int, error) {
+func (p *pgPostRepository) Count(ctx context.Context, board string, parent int) (int, error) {
 	queryTemplate :=
 		`SELECT COUNT(*) FROM posts
 	WHERE board = $1 AND parent = $2

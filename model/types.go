@@ -1,6 +1,10 @@
 package model
 
-import "time"
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
 
 type Board struct {
 	Slug  string `db:"slug" json:"slug"`
@@ -37,4 +41,10 @@ type PageValue struct {
 type BoardPage struct {
 	Page    *PageValue       `json:"page"`
 	Threads []*ThreadPreview `json:"threads"`
+}
+
+type Attachment struct {
+	Filename string
+	FileSize int
+	UUID     uuid.UUID
 }

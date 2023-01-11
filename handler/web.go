@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
-	"path/filepath"
 
 	"github.com/1ort/goimbo/model"
 	"github.com/gin-contrib/sessions"
@@ -17,22 +16,27 @@ type WebConfig struct {
 	R            *gin.Engine //router
 	BaseURL      string
 	Userspace    model.Userspace
+	Attachments  model.AttachmentService
 	CookieSecret string
 	XCSRFSecret  string
 	Captcha      WebCaptchaWrapper
+	// AttachmentDirectory string
 }
 
 type WebHandler struct {
-	userspace model.Userspace
-	r         *gin.Engine
-	captcha   WebCaptchaWrapper
+	userspace   model.Userspace
+	r           *gin.Engine
+	captcha     WebCaptchaWrapper
+	attachments model.AttachmentService
+	// attachmentDirectory string
 }
 
 func SetWebHandler(cfg *WebConfig) {
 	h := &WebHandler{
-		userspace: cfg.Userspace,
-		r:         cfg.R,
-		captcha:   cfg.Captcha,
+		userspace:   cfg.Userspace,
+		r:           cfg.R,
+		captcha:     cfg.Captcha,
+		attachments: cfg.Attachments,
 	}
 
 	funcmap := template.FuncMap{
@@ -175,6 +179,10 @@ func (h *WebHandler) reply(c *gin.Context) {
 		return
 	}
 
+	newPost, err := h.userspace.Reply(c.Request.Context(), t.Board, p.Com, t.Thread)
+	if handled := h.handleError(c, err); handled {
+		return
+	}
 	//files uploading
 	form, err := c.MultipartForm()
 	if err != nil {
@@ -182,18 +190,9 @@ func (h *WebHandler) reply(c *gin.Context) {
 		return
 	}
 	files := form.File["files"]
-	for _, file := range files {
-		filename := filepath.Base(file.Filename)
-		if err := c.SaveUploadedFile(file, filename); err != nil {
-			h.handleError(c, model.NewBadRequest("File upload error"))
-			return
-		}
-	}
-	//end file uploading
-
-	newPost, err := h.userspace.Reply(c.Request.Context(), t.Board, p.Com, t.Thread)
-	if handled := h.handleError(c, err); handled {
-		return
+	_, err = h.attachments.AttachFromFileHeaders(c.Request.Context(), files, newPost)
+	if err != nil {
+		h.handleError(c, err)
 	}
 	c.Redirect(http.StatusFound, fmt.Sprintf("/%s/thread/%v#%v", t.Board, t.Thread, newPost.No))
 }

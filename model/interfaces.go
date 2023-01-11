@@ -3,6 +3,9 @@ package model
 import (
 	"context"
 	"io"
+	"mime/multipart"
+
+	"github.com/google/uuid"
 )
 
 // repository layer
@@ -19,6 +22,12 @@ type PostRepository interface {
 	Count(ctx context.Context, board string, parent int) (int, error)
 }
 
+type AttachmentRepository interface {
+	SaveAttachments(ctx context.Context, board string, post int, attachments []*Attachment) ([]*Attachment, error)
+	GetMultiple(ctx context.Context, board string, post int) ([]*Attachment, error)
+	GetSingle(ctx context.Context, UUID uuid.UUID) (*Attachment, error)
+}
+
 // service layer
 type Userspace interface {
 	GetBoards(ctx context.Context) ([]*Board, error)
@@ -30,6 +39,13 @@ type Userspace interface {
 	Reply(ctx context.Context, board, com string, parent int) (*Post, error)
 }
 
+type AttachmentService interface {
+	AttachFromFileHeaders(ctx context.Context, files []*multipart.FileHeader, post *Post) ([]*Attachment, error)
+	// GetFromPost(ctx context.Context, post *Post) ([]*Attachment, Error)
+	// WriteContent(uuid uuid.UUID)
+	// WritePreview(uuid uuid.UUID)
+}
+
 type Adminspace interface {
 }
 
@@ -38,4 +54,7 @@ type Captcha interface {
 	Verify(id, solution string) (bool, error)
 	//Write captcha task
 	Write(w io.Writer, id string) error
+}
+
+type MultipartFileSaver interface {
 }
